@@ -2,12 +2,16 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "module": "ES2020",
+    "module": "esnext",
     "paths": {
       "@/*": [
         "./*"
       ]
-    }
+    },
+		"target": "esnext",
+		"moduleResolution": "node",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"skipLibCheck": true
   },
   "include": [
     "**/*.ts",

@@ -7,7 +7,7 @@ import SittingRoom2 from "@/assets/images/2.jpg";
 
 const HOUSES = [
   {
-        noOfBedrooms: 1,
+    noOfBedrooms: 1,
     area: "Woodlands",
     listing: "rent",
     price: 200000,
