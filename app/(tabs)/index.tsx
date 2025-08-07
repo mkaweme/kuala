@@ -1,65 +1,66 @@
 import React from "react";
-import { StyleSheet, Image, Modal } from 'react-native';
+import { StyleSheet, Image } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
-import SitingRoom1 from "@/assets/images/1.jpg";
+import SittingRoom1 from "@/assets/images/1.jpg";
+import SittingRoom2 from "@/assets/images/2.jpg";
 
 const HOUSES = [
   {
-    noOfBedrooms: 1,
+        noOfBedrooms: 1,
     area: "Woodlands",
     listing: "rent",
     price: 200000,
-    features: ["Tiles", "Built-In Kitchen Units", 
+    features: ["Tiles", "Built-In Kitchen Units",
       "Built-In Wardrobe", "Road Frontage", "Paved Yard"],
     photos: [
       {
         name: "Sitting Room",
         src: [
-          SitingRoom1,
-          require(`../assets/images/${2}.jpg`),
+          SittingRoom1,
+          SittingRoom2,
         ]
       },
       {
         name: "Kitchen",
         src: [
-          require("@/assets/images/3.jpg"),
-          require("@/assets/images/4.jpg"),
+          SittingRoom1,
+          SittingRoom2,
         ]
       },
       {
         name: "Toilet",
-        src: `require("@/assets/images/5.jpg")`,
-        
+        src: [`require("@/assets/images/5.jpg")`],
+
       },
       {
         name: "Bathroom",
         src: [
-          require("@/assets/images/6.jpg"),
+          SittingRoom1,
         ]
       },
       {
         name: "Front",
         src: [
-          require("@/assets/images/7.jpg"),
+          SittingRoom1,
         ]
       },
       {
         name: "Bedroom",
         src: [
-          require("@/assets/images/8.jpg"),
+          SittingRoom2,
         ]
       },
       {
         name: "Back",
         src: [
-          require("@/assets/images/9.jpg"),
+          SittingRoom1,
         ]
       },
       {
         name: "Yard",
         src: [
-          require("@/assets/images/10.jpg"),
+          SittingRoom2,
         ]
       },
 
@@ -70,57 +71,57 @@ const HOUSES = [
     area: "Ibex Hill",
     listing: "rent",
     price: 500000,
-    features: ["Tiles", "Built-In Kitchen Units", 
+    features: ["Tiles", "Built-In Kitchen Units",
       "Built-In Wardrobes", "Paved Yard"],
     photos: [
       {
         name: "Sitting Room",
         src: [
-          require("@/assets/images/1.jpg"),
-          require("@/assets/images/2.jpg"),
+          SittingRoom1,
+          SittingRoom2,
         ]
       },
       {
         name: "Kitchen",
         src: [
-          require("@/assets/images/3.jpg"),
-          require("@/assets/images/4.jpg"),
+          SittingRoom1,
+          SittingRoom2,
         ]
       },
       {
         name: "Toilet",
         src: [
-          require("@/assets/images/5.jpg"),
+          SittingRoom1,
         ]
       },
       {
         name: "Bathroom",
         src: [
-          require("@/assets/images/6.jpg"),
+          "@/assets/images/6.jpg",
         ]
       },
       {
         name: "Front",
         src: [
-          require("@/assets/images/7.jpg"),
+          ("@/assets/images/7.jpg"),
         ]
       },
       {
         name: "Bedroom",
         src: [
-          require("@/assets/images/8.jpg"),
+          ("@/assets/images/8.jpg"),
         ]
       },
       {
         name: "Back",
         src: [
-          require("@/assets/images/9.jpg"),
+          ("@/assets/images/9.jpg"),
         ]
       },
       {
         name: "Yard",
         src: [
-          require("@/assets/images/10.jpg"),
+          ("@/assets/images/10.jpg"),
         ]
       },
 
@@ -131,70 +132,70 @@ const HOUSES = [
     area: "Meanwood Chamba Valley",
     listing: "Sale",
     price: 90000000,
-    features: ["Tiles", "Built-In Kitchen Units", 
+    features: ["Tiles", "Built-In Kitchen Units",
       "Built-In Wardrobe", "Road Frontage", "Open Plan Kitchen",
       "Paved Yard", "Master Self-contained", "3 Toilets", "2 Baths"],
     photos: [
       {
         name: "Sitting Room",
         src: [
-          require("@/assets/images/1.jpg"),
-          require("@/assets/images/2.jpg"),
+          "@/assets/images/1.jpg",
+          "@/assets/images/2.jpg",
         ]
       },
       {
         name: "Kitchen",
         src: [
-          require("@/assets/images/3.jpg"),
-          require("@/assets/images/4.jpg"),
+          "@/assets/images/3.jpg",
+          "@/assets/images/4.jpg",
         ]
       },
       {
         name: "Toilet",
         src: [
-          require("@/assets/images/5.jpg"),
+          "@/assets/images/5.jpg",
         ]
       },
       {
         name: "Bathroom",
         src: [
-          require("@/assets/images/6.jpg"),
+          "@/assets/images/6.jpg",
         ]
       },
       {
         name: "Front",
         src: [
-          require("@/assets/images/7.jpg"),
+          "@/assets/images/7.jpg",
         ]
       },
       {
         name: "Master Bedroom",
         src: [
-          require("@/assets/images/8.jpg"),
+          "@/assets/images/8.jpg",
         ]
       },
       {
         name: "Bedroom",
         src: [
-          require("@/assets/images/8.jpg"),
+          "@/assets/images/8.jpg",
         ]
       },
       {
         name: "Bedroom",
         src: [
-          require("@/assets/images/8.jpg"),
+          "@/assets/images/8.jpg",
         ]
       },
       {
         name: "Back",
         src: [
-          require("@/assets/images/9.jpg"),
+          "@/assets/images/9.jpg",
         ]
       },
       {
         name: "Yard",
         src: [
-          require("@/assets/images/10.jpg"),
+          "@/assets/images/10.jpg",
         ]
       },
 
@@ -204,17 +205,16 @@ const HOUSES = [
 
 export default function TabOneScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Listings</Text>
+    <View style={ styles.container }>
+      <Text style={  styles.title }>Listings</Text>
       <View>
-        <Image   
-          source={require("@/assets/images/1.jpg")}
-          style={{ width: 350, height: 350 }} 
-          resizeMode="contain" 
+        <Image
+          source={ { uri: "https://unsplash.com/photos/a-group-of-people-holding-bowls-of-food-GJPJB3RqeGo" } }
+          style={ { width: 350, height: 350 } }
+          resizeMode="contain"
         />
       </View>
-      <Modal />
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <View style={ styles.separator } lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );
