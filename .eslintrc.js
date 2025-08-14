@@ -1,57 +1,10 @@
-// export default {
-//   env: {
-//     browser: true,
-//     es2021: true,
-//     node: true,
-//   },
-//   extends: [
-//     "wesbos/typescript"
-//   ],
-//   parserOptions: {
-//     ecmaFeatures: {
-//       jsx: true,
-//       modules: true,
-//     },
-//     ecmaVersion: 12,
-//     sourceType: "module",
-//   },
-//   plugins: ["react"],
-//   rules: {
-    // indent: ["off"],
-//     "prettier/prettier": [
-//       "error",
-//       {
-//         endOfLine: "auto",
-//         trailingComma: "es5",
-//       },
-//     ],
-// "linebreak-style": ["error", "windows"],
-//     quotes: ["error", "double"],
-// semi: ["error", "always"],
-// "no-trailing-spaces": ["error", { ignoreComments: true }],
-// "padded-blocks": ["error", "never"],
-// "no-unused-vars": ["off"],
-//     "extends": [
-//       "wesbos"
-//     ],
-//     "rules": {
-//       "no-console": 2,
-//     }
-//   },
-//   settings: {
-//     "react": {
-//       "version": "detect"
-//     }
-//   }
-// };
-
 // This is a patch so that eslint will load the plugins as dependencies. Otherwise we can to install EVERYTHING in th root project
-import '@rushstack/eslint-patch/modern-module-resolution'; 
+import "@rushstack/eslint-patch/modern-module-resolution";
 
 export default {
-  extends: ['airbnb', 'prettier'],
+  extends: ["airbnb", "prettier"],
   parserOptions: {
-    ecmaVersion: 'latest',
+    ecmaVersion: "latest",
   },
   env: {
     browser: true,
@@ -60,114 +13,109 @@ export default {
     jest: true,
   },
   rules: {
-    'no-debugger': 0,
-    'no-use-before-define': 'off',
-    'import/no-cycle': 'off',
-    'no-alert': 0,
-    'no-await-in-loop': 0,
-    'no-return-assign': ['error', 'except-parens'],
-    'no-restricted-syntax': [
-      2,
-      'ForInStatement',
-      'LabeledStatement',
-      'WithStatement',
-    ],
-    'no-unused-vars': [
+    "no-debugger": 0,
+    "no-use-before-define": "off",
+    "import/no-cycle": "off",
+    "no-alert": 0,
+    "no-await-in-loop": 0,
+    "no-return-assign": ["error", "except-parens"],
+    "no-restricted-syntax": [2, "ForInStatement", "LabeledStatement", "WithStatement"],
+    "no-unused-vars": [
       1,
       {
         ignoreRestSiblings: true,
-        argsIgnorePattern: 'res|next|^err|^_',
-        varsIgnorePattern: '^_',
+        argsIgnorePattern: "res|next|^err|^_",
+        varsIgnorePattern: "^_",
         // Broken in TypeSCript.Want this turned on
         // destructuredArrayIgnorePattern: '^_',
       },
     ],
-    'prefer-const': [
-      'error',
+    "prefer-const": [
+      "error",
       {
-        destructuring: 'all',
+        destructuring: "all",
       },
     ],
-    'arrow-body-style': [2, 'as-needed'],
-    'no-unused-expressions': [
-      'error',
+    "arrow-body-style": [2, "as-needed"],
+    "no-unused-expressions": [
+      "error",
       {
         allowTaggedTemplates: true,
         allowShortCircuit: true,
         allowTernary: true,
       },
     ],
-    'no-param-reassign': [
+    "no-param-reassign": [
       2,
       {
         props: false,
       },
     ],
-    'no-console': 0,
-    'import/prefer-default-export': 0,
+    "no-console": 0,
+    "import/prefer-default-export": 0,
     import: 0,
-    'func-names': 0,
-    'space-before-function-paren': 0,
-    'comma-dangle': 0,
-    'max-len': 0,
-    'import/extensions': 0,
-    'no-underscore-dangle': 0,
-    'consistent-return': 0,
-    'react/display-name': 1,
-    'react/no-array-index-key': 0,
-    'react/react-in-jsx-scope': 0,
-    'react/prefer-stateless-function': 0,
-    'react/forbid-prop-types': 0,
-    'react/no-unescaped-entities': 0,
-    'react/function-component-definition': 0,
-    'jsx-a11y/accessible-emoji': 0,
-    'jsx-a11y/label-has-associated-control': [
-      'error',
+    "func-names": 0,
+    "space-before-function-paren": 0,
+    "comma-dangle": 0,
+    "max-len": 0,
+    "import/extensions": 0,
+    "no-underscore-dangle": 0,
+    "consistent-return": 0,
+    "react/display-name": 1,
+    "react/no-array-index-key": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/prefer-stateless-function": 0,
+    "react/forbid-prop-types": 0,
+    "react/no-unescaped-entities": 0,
+    "react/function-component-definition": 0,
+    "jsx-a11y/accessible-emoji": 0,
+    "jsx-a11y/label-has-associated-control": [
+      "error",
       {
-        assert: 'either',
+        assert: "either",
       },
     ],
-    'react/require-default-props': 0,
-    'react/jsx-filename-extension': [
+    "react/require-default-props": 0,
+    "react/jsx-filename-extension": [
       1,
       {
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.mdx'],
+        extensions: [".js", ".jsx", ".ts", ".tsx", ".mdx"],
       },
     ],
     radix: 0,
-    'no-shadow': [
+    "no-shadow": [
       2,
       {
-        hoist: 'all',
-        allow: ['resolve', 'reject', 'done', 'next', 'err', 'error'],
+        hoist: "all",
+        allow: ["resolve", "reject", "done", "next", "err", "error"],
       },
     ],
     quotes: [
       2,
-      'single',
+      "single",
       {
         avoidEscape: true,
         allowTemplateLiterals: true,
       },
     ],
-    'prettier/prettier': [
-      'error',
+    "prettier/prettier": [
+      "error",
       {
         singleQuote: true,
-        endOfLine: 'auto',
+        endOfLine: "auto",
       },
     ],
-    'jsx-a11y/href-no-hash': 'off',
-    'jsx-a11y/anchor-is-valid': [
-      'warn',
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/anchor-is-valid": [
+      "warn",
       {
-        aspects: ['invalidHref'],
+        aspects: ["invalidHref"],
       },
     ],
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    '@typescript-eslint/comma-dangle': ['off'],
-    'react/jsx-props-no-spreading': 'off',
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/comma-dangle": ["off"],
+    "react/jsx-props-no-spreading": "off",
   },
-  plugins: ['html', 'prettier', 'react-hooks'],
+  plugins: ["html", "prettier", "react-hooks"],
 };
