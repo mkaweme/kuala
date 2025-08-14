@@ -4,19 +4,12 @@
     "strict": true,
     "module": "esnext",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
-		"target": "esnext",
-		"moduleResolution": "node",
-		"lib": ["ESNext", "DOM", "DOM.Iterable"],
-		"skipLibCheck": true
+    "target": "esnext",
+    "moduleResolution": "node",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "declarations.d.ts", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }
