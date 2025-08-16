@@ -2,13 +2,17 @@ import SittingRoom1 from "@/assets/images/1.jpg";
 import SittingRoom2 from "@/assets/images/2.jpg";
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { Text, View } from "@/components/Themed";
-import React from "react";
-import { Image, StyleSheet } from "react-native";
+import { House } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, TextInput } from "react-native";
+import HouseComponent from "./components/house";
 
-const HOUSES = [
+const HOUSES: House[] = [
   {
     noOfBedrooms: 1,
     area: "Woodlands",
+    town: "Lusaka",
     listing: "rent",
     price: 200000,
     features: [
@@ -56,6 +60,7 @@ const HOUSES = [
   {
     noOfBedrooms: 3,
     area: "Ibex Hill",
+    town: "Lusaka",
     listing: "rent",
     price: 500000,
     features: ["Tiles", "Built-In Kitchen Units", "Built-In Wardrobes", "Paved Yard"],
@@ -97,7 +102,8 @@ const HOUSES = [
   {
     noOfBedrooms: 3,
     area: "Meanwood Chamba Valley",
-    listing: "Sale",
+    town: "Lusaka",
+    listing: "sale",
     price: 90000000,
     features: [
       "Tiles",
@@ -155,34 +161,66 @@ const HOUSES = [
   },
 ];
 
-export default function TabOneScreen() {
+const TabOneScreen = () => {
+  const [searchTerm, setSearchTerm] = useState<string>("");
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Listings</Text>
-      <View>
-        <Image
-          source={{
-            uri: "https://unsplash.com/photos/a-group-of-people-holding-bowls-of-food-GJPJB3RqeGo",
-          }}
-          style={{ width: 350, height: 350 }}
-          resizeMode="contain"
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ alignItems: "center", justifyContent: "center" }}
+    >
+      {/*Search bar */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={24} color="black" />
+        <TextInput
+          placeholder="Search"
+          value={searchTerm}
+          onChangeText={(text) => setSearchTerm(text)}
+          style={styles.searchInput}
         />
       </View>
+      <Text style={styles.title}>Listings</Text>
+      {HOUSES.map((house, index) => (
+        <HouseComponent key={index} house={house} />
+      ))}
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    </ScrollView>
   );
-}
+};
+
+export default TabOneScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  searchContainer: {
+    width: 300,
+    flex: 1,
+    flexDirection: "row",
+    borderRadius: 15,
+    borderColor: "#4CAF50",
+    borderWidth: 2,
+    backgroundColor: "#ffffff",
     alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  searchInput: {
+    paddingLeft: 10,
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#000000",
+    marginTop: 10,
+  },
+  detailsRow: {
+    flexDirection: "row",
+    backgroundColor: "brown",
+    justifyContent: "space-between",
   },
   separator: {
     marginVertical: 30,
