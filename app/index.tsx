@@ -52,7 +52,6 @@ export default function LandingPage() {
             {isLoading && (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#4CAF50" />
-                <Text style={styles.loadingText}>Loading your experience...</Text>
               </View>
             )}
           </View>
