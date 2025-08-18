@@ -1,11 +1,10 @@
 import SittingRoom1 from "@/assets/images/1.jpg";
 import SittingRoom2 from "@/assets/images/2.jpg";
-import EditScreenInfo from "@/components/EditScreenInfo";
 import { Text, View } from "@/components/Themed";
 import { House } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, TextInput } from "react-native";
+import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import HouseComponent from "./components/house";
 
 const HOUSES: House[] = [
@@ -15,6 +14,8 @@ const HOUSES: House[] = [
     town: "Lusaka",
     listing: "rent",
     price: 200000,
+    rate: "pm",
+    type: "House",
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -63,6 +64,8 @@ const HOUSES: House[] = [
     town: "Lusaka",
     listing: "rent",
     price: 500000,
+    rate: "pm",
+    type: "House",
     features: ["Tiles", "Built-In Kitchen Units", "Built-In Wardrobes", "Paved Yard"],
     photos: [
       {
@@ -105,6 +108,7 @@ const HOUSES: House[] = [
     town: "Lusaka",
     listing: "sale",
     price: 90000000,
+    type: "House",
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -119,7 +123,7 @@ const HOUSES: House[] = [
     photos: [
       {
         name: "Sitting Room",
-        src: ["@/assets/images/1.jpg", "@/assets/images/2.jpg"],
+        src: [SittingRoom2, SittingRoom1],
       },
       {
         name: "Kitchen",
@@ -159,72 +163,222 @@ const HOUSES: House[] = [
       },
     ],
   },
+  {
+    noOfBedrooms: 3,
+    area: "Chinika",
+    town: "Lusaka",
+    listing: "lease",
+    price: 150000000,
+    type: "Warehouse",
+    features: ["Road Frontage", "Overhead Crane"],
+    photos: [
+      {
+        name: "Yard",
+        src: [SittingRoom2, SittingRoom1],
+      },
+      {
+        name: "Entrance",
+        src: [SittingRoom2, SittingRoom1],
+      },
+      {
+        name: "Offices",
+        src: [SittingRoom2, SittingRoom1],
+      },
+      {
+        name: "Bathroom",
+        src: [SittingRoom2, SittingRoom1],
+      },
+    ],
+  },
 ];
 
-const TabOneScreen = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
+const propertyTypes = ["All", "House", "Office", "Plot", "Farm", "Warehouse"];
+
+const Home = () => {
+  const [selectedPropertyType, setSelectedPropertyType] = useState<string>("All");
+
+  // Filter houses based on property type only
+  const filteredHouses =
+    selectedPropertyType === "All"
+      ? HOUSES
+      : HOUSES.filter((house) => selectedPropertyType === "House" && house.noOfBedrooms > 0);
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ alignItems: "center", justifyContent: "center" }}
-    >
-      {/*Search bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={24} color="black" />
-        <TextInput
-          placeholder="Search"
-          value={searchTerm}
-          onChangeText={(text) => setSearchTerm(text)}
-          style={styles.searchInput}
-        />
+    <ScrollView style={styles.container}>
+      <View style={styles.headerContainer}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Find Your Dream Property</Text>
+          <Text style={styles.headerSubtitle}>Discover the perfect place</Text>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={24} color="#4CAF50" />
+          <TextInput
+            placeholder="Search by area, town, or features..."
+            placeholderTextColor="#999"
+            style={styles.searchInput}
+          />
+        </View>
       </View>
-      <Text style={styles.title}>Listings</Text>
-      {HOUSES.map((house, index) => (
-        <HouseComponent key={index} house={house} />
-      ))}
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+
+      {/* Property Type Filters */}
+      <View style={styles.filterSection}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterScrollContainer}
+          style={styles.filterScrollView}
+        >
+          {propertyTypes.map((type) => (
+            <TouchableOpacity
+              key={type}
+              style={[styles.filterChip, selectedPropertyType === type && styles.filterChipActive]}
+              onPress={() => setSelectedPropertyType(type)}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  selectedPropertyType === type && styles.filterChipTextActive,
+                ]}
+              >
+                {type}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Results Count */}
+      <View style={styles.resultsContainer}>
+        <Text style={styles.resultsText}>
+          {filteredHouses.length} {filteredHouses.length === 1 ? "property" : "properties"} found
+        </Text>
+      </View>
+
+      {/* Properties List */}
+      <ScrollView
+        style={styles.propertiesContainer}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.propertiesContent}
+      >
+        {filteredHouses.map((house, index) => (
+          <HouseComponent key={index} house={house} />
+        ))}
+      </ScrollView>
     </ScrollView>
   );
 };
 
-export default TabOneScreen;
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  headerContainer: {
+    backgroundColor: "#4CAF50",
+  },
+  header: {
+    padding: 20,
+    backgroundColor: "#4CAF50",
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.8)",
   },
   searchContainer: {
-    width: 300,
-    flex: 1,
     flexDirection: "row",
-    borderRadius: 15,
-    borderColor: "#4CAF50",
-    borderWidth: 2,
-    backgroundColor: "#ffffff",
     alignItems: "center",
-    paddingHorizontal: 5,
-    paddingVertical: 10,
-    marginTop: 20,
-    marginBottom: 10,
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   searchInput: {
-    paddingLeft: 10,
+    flex: 1,
+    marginLeft: 15,
+    fontSize: 16,
+    color: "#333",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000000",
-    marginTop: 10,
+  advancedSearchButton: {
+    marginLeft: 15,
+    padding: 5,
   },
-  detailsRow: {
-    flexDirection: "row",
-    backgroundColor: "brown",
-    justifyContent: "space-between",
+  filterSection: {
+    marginTop: 25,
+    paddingHorizontal: 20,
+    backgroundColor: "",
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 15,
+  },
+  filterScrollView: {
+    backgroundColor: "transparent",
+  },
+  filterScrollContainer: {
+    paddingRight: 20,
+  },
+  filterChip: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginRight: 15,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  filterChipActive: {
+    backgroundColor: "#4CAF50",
+    borderColor: "#4CAF50",
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#666",
+  },
+  filterChipTextActive: {
+    color: "#fff",
+  },
+  resultsContainer: {
+    paddingHorizontal: 20,
+    marginTop: 25,
+    marginBottom: 15,
+    backgroundColor: "",
+  },
+  resultsText: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
+  },
+  propertiesContainer: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+  propertiesContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
 });

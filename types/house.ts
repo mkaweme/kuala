@@ -4,13 +4,15 @@ export interface Photo {
 }
 
 export interface House {
-  noOfBedrooms: number;
   area: string;
-  town: string;
-  listing: "rent" | "sale" | "lease";
-  price: number;
   features: string[];
+  listing: "rent" | "sale" | "lease";
+  noOfBedrooms: number;
   photos: Photo[];
+  price: number;
+  rate?: string;
+  town: string;
+  type: string;
 }
 
 export interface HouseFilters {
