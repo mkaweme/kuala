@@ -5,7 +5,8 @@ import { House } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import { Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import HouseComponent from "./components/house";
+import HouseComponent from "@/components/house";
+import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 
 const HOUSES: House[] = [
   {
@@ -207,6 +208,7 @@ const SearchScreen = () => {
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [minBedrooms, setMinBedrooms] = useState<string>("");
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
 
   // Filter houses based on all search criteria
   const filteredHouses = useMemo(() => {
@@ -282,26 +284,28 @@ const SearchScreen = () => {
     minBedrooms !== "";
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Advanced Search</Text>
-        <Text style={styles.headerSubtitle}>Find your perfect property</Text>
-      </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.headerContainer}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Advanced Search</Text>
+          <Text style={styles.headerSubtitle}>Find your dream property</Text>
+        </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={24} color="#4CAF50" />
-        <TextInput
-          placeholder="Search by area, town, or features..."
-          placeholderTextColor="#999"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          style={styles.searchInput}
-        />
-        <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilters(true)}>
-          <Ionicons name="filter" size={24} color="#4CAF50" />
-        </TouchableOpacity>
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={24} color="#4CAF50" />
+          <TextInput
+            placeholder="Search by area, town, or features..."
+            placeholderTextColor="#999"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            style={styles.searchInput}
+          />
+          <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilters(true)}>
+            <Ionicons name="filter" size={24} color="#4CAF50" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Active Filters Display */}
@@ -385,7 +389,9 @@ const SearchScreen = () => {
         contentContainerStyle={styles.propertiesContent}
       >
         {filteredHouses.length > 0 ? (
-          filteredHouses.map((house, index) => <HouseComponent key={index} house={house} />)
+          filteredHouses.map((house, index) => (
+            <HouseComponent key={index} house={house} onPress={setSelectedHouse} />
+          ))
         ) : (
           <View style={styles.noResultsContainer}>
             <Ionicons name="search-outline" size={64} color="#ccc" />
@@ -394,6 +400,12 @@ const SearchScreen = () => {
           </View>
         )}
       </ScrollView>
+
+      <PropertyDetailsModal
+        visible={selectedHouse !== null}
+        house={selectedHouse}
+        onClose={() => setSelectedHouse(null)}
+      />
 
       {/* Filters Modal */}
       <Modal
@@ -562,7 +574,7 @@ const SearchScreen = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -573,10 +585,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
+  headerContainer: {
+    backgroundColor: "#4CAF50",
+  },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
+    padding: 20,
     backgroundColor: "#4CAF50",
   },
   headerTitle: {
@@ -593,10 +606,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     marginHorizontal: 20,
-    marginTop: -20,
+    marginBottom: 20,
     borderRadius: 25,
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -647,11 +660,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 20,
     marginBottom: 15,
+    backgroundColor: "",
   },
   resultsText: {
     fontSize: 16,
     color: "#666",
-    fontWeight: "500",
+    fontWeight: "700",
   },
   propertiesContainer: {
     flex: 1,

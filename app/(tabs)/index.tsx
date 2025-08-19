@@ -1,13 +1,15 @@
 import SittingRoom1 from "@/assets/images/1.jpg";
 import SittingRoom2 from "@/assets/images/2.jpg";
+import HouseComponent from "@/components/house";
+import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
+import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { House } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import HouseComponent from "./components/house";
 
-const HOUSES: House[] = [
+export const HOUSES: House[] = [
   {
     noOfBedrooms: 1,
     area: "Woodlands",
@@ -195,7 +197,9 @@ const HOUSES: House[] = [
 const propertyTypes = ["All", "House", "Office", "Plot", "Farm", "Warehouse"];
 
 const Home = () => {
+  const { colors } = useColorScheme();
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("All");
+  const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
 
   // Filter houses based on property type only
   const filteredHouses =
@@ -204,21 +208,25 @@ const Home = () => {
       : HOUSES.filter((house) => selectedPropertyType === "House" && house.noOfBedrooms > 0);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.headerContainer, { backgroundColor: colors.primary }]}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Find Your Dream Property</Text>
-          <Text style={styles.headerSubtitle}>Discover the perfect place</Text>
+        <View style={[styles.header, { backgroundColor: colors.primary }]}>
+          <Text style={[styles.headerTitle, { color: colors.buttonText }]}>
+            Find Your Dream Property
+          </Text>
+          <Text style={[styles.headerSubtitle, { color: colors.buttonTextSecondary }]}>
+            Discover the perfect place
+          </Text>
         </View>
 
         {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={24} color="#4CAF50" />
+        <View style={[styles.searchContainer, { backgroundColor: colors.card }]}>
+          <Ionicons name="search" size={24} color={colors.primary} />
           <TextInput
             placeholder="Search by area, town, or features..."
-            placeholderTextColor="#999"
-            style={styles.searchInput}
+            placeholderTextColor={colors.inputPlaceholder}
+            style={[styles.searchInput, { color: colors.text }]}
           />
         </View>
       </View>
@@ -234,13 +242,21 @@ const Home = () => {
           {propertyTypes.map((type) => (
             <TouchableOpacity
               key={type}
-              style={[styles.filterChip, selectedPropertyType === type && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.card, borderColor: colors.border },
+                selectedPropertyType === type && {
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
+              ]}
               onPress={() => setSelectedPropertyType(type)}
             >
               <Text
                 style={[
                   styles.filterChipText,
-                  selectedPropertyType === type && styles.filterChipTextActive,
+                  { color: colors.textSecondary },
+                  selectedPropertyType === type && { color: colors.buttonText },
                 ]}
               >
                 {type}
@@ -252,7 +268,7 @@ const Home = () => {
 
       {/* Results Count */}
       <View style={styles.resultsContainer}>
-        <Text style={styles.resultsText}>
+        <Text style={[styles.resultsText, { color: colors.textSecondary }]}>
           {filteredHouses.length} {filteredHouses.length === 1 ? "property" : "properties"} found
         </Text>
       </View>
@@ -264,9 +280,14 @@ const Home = () => {
         contentContainerStyle={styles.propertiesContent}
       >
         {filteredHouses.map((house, index) => (
-          <HouseComponent key={index} house={house} />
+          <HouseComponent key={index} house={house} onPress={setSelectedHouse} />
         ))}
       </ScrollView>
+      <PropertyDetailsModal
+        visible={selectedHouse !== null}
+        house={selectedHouse}
+        onClose={() => setSelectedHouse(null)}
+      />
     </ScrollView>
   );
 };
@@ -315,20 +336,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  advancedSearchButton: {
-    marginLeft: 15,
-    padding: 5,
-  },
   filterSection: {
-    marginTop: 25,
+    marginTop: 10,
     paddingHorizontal: 20,
     backgroundColor: "",
-  },
-  filterTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 15,
   },
   filterScrollView: {
     backgroundColor: "transparent",
@@ -371,7 +382,7 @@ const styles = StyleSheet.create({
   resultsText: {
     fontSize: 16,
     color: "#666",
-    fontWeight: "500",
+    fontWeight: "700",
   },
   propertiesContainer: {
     flex: 1,

@@ -2,10 +2,20 @@
  * Learn more about Light and Dark modes:
  * https://docs.expo.io/guides/color-schemes/
  */
-import React from "react";
-import { Text as DefaultText, View as DefaultView } from "react-native";
-import Colors from "@/constants/Colors";
-import { useColorScheme } from "./useColorScheme";
+import { useColorScheme } from "@/contexts/ColorSchemeContext";
+import {
+  Text as DefaultText,
+  TextInput as DefaultTextInput,
+  View as DefaultView,
+} from "react-native";
+
+export function useThemeColor(
+  props: { light?: string; dark?: string },
+  colorName: keyof ReturnType<typeof useColorScheme>["colors"],
+) {
+  const { colors } = useColorScheme();
+  return colors[colorName];
+}
 
 type ThemeProps = {
   lightColor?: string;
@@ -14,20 +24,7 @@ type ThemeProps = {
 
 export type TextProps = ThemeProps & DefaultText["props"];
 export type ViewProps = ThemeProps & DefaultView["props"];
-
-export function useThemeColor(
-  props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
-) {
-  const theme = useColorScheme() ?? "light";
-  const colorFromProps = props[theme];
-
-  if (colorFromProps) {
-    return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
-  }
-}
+export type TextInputProps = ThemeProps & DefaultTextInput["props"];
 
 export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
@@ -41,4 +38,30 @@ export function View(props: ViewProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "background");
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function TextInput(props: TextInputProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "inputBackground");
+  const borderColor = useThemeColor({ light: lightColor, dark: darkColor }, "inputBorder");
+
+  return (
+    <DefaultTextInput
+      style={[
+        {
+          color,
+          backgroundColor,
+          borderColor,
+          borderWidth: 1,
+          borderRadius: 8,
+          paddingHorizontal: 12,
+          paddingVertical: 12,
+          fontSize: 16,
+        },
+        style,
+      ]}
+      {...otherProps}
+    />
+  );
 }
