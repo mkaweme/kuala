@@ -5,15 +5,16 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface HouseProps {
   house: House;
+  onPress?: (house: House) => void;
 }
 
-const HouseComponent: React.FC<HouseProps> = ({ house }) => {
+const HouseComponent: React.FC<HouseProps> = ({ house, onPress }) => {
   return (
-    <TouchableOpacity style={styles.container} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.container} activeOpacity={0.8} onPress={() => onPress?.(house)}>
       {house.photos.length > 0 && (
         <View style={styles.houseContainer}>
           <View style={styles.imageContainer}>
-            <Image source={house.photos[0].src[0]} style={styles.image} resizeMode="cover" />
+            <Image source={house.photos[0].src[0] as any} style={styles.image} resizeMode="cover" />
             <View style={styles.priceTag}>
               <Text style={styles.priceText}>
                 K{house.price / 100}
@@ -164,3 +165,5 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
 });
+
+
