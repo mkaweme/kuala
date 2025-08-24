@@ -1,22 +1,24 @@
 import SittingRoom1 from "@/assets/images/1.jpg";
 import SittingRoom2 from "@/assets/images/2.jpg";
+import PropertyCard from "@/components/PropertyCard";
+import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
-import { House } from "@/types";
+import { HouseProperty } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import { Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import HouseComponent from "@/components/house";
-import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 
-const HOUSES: House[] = [
+const HOUSES: HouseProperty[] = [
   {
+    id: "1",
+    title: "Modern 1 Bedroom House",
     noOfBedrooms: 1,
     area: "Woodlands",
     town: "Lusaka",
     listing: "rent",
     price: 200000,
     rate: "pm",
-    type: "House",
+    type: "house",
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -58,15 +60,19 @@ const HOUSES: House[] = [
         src: [SittingRoom2],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
+    id: "2",
+    title: "Spacious 3 Bedroom House",
     noOfBedrooms: 3,
     area: "Ibex Hill",
     town: "Lusaka",
     listing: "rent",
     price: 500000,
     rate: "pm",
-    type: "House",
+    type: "house",
     features: ["Tiles", "Built-In Kitchen Units", "Built-In Wardrobes", "Paved Yard"],
     photos: [
       {
@@ -102,14 +108,18 @@ const HOUSES: House[] = [
         src: ["@/assets/images/10.jpg"],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
-    noOfBedrooms: 3,
+    id: "3",
+    title: "Spacious 4 bedroomed house",
+    noOfBedrooms: 4,
     area: "Meanwood Chamba Valley",
     town: "Lusaka",
     listing: "sale",
-    price: 90000000,
-    type: "House",
+    price: 140000000,
+    type: "house",
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -163,6 +173,8 @@ const HOUSES: House[] = [
         src: ["@/assets/images/10.jpg"],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     noOfBedrooms: 3,
@@ -390,7 +402,7 @@ const SearchScreen = () => {
       >
         {filteredHouses.length > 0 ? (
           filteredHouses.map((house, index) => (
-            <HouseComponent key={index} house={house} onPress={setSelectedHouse} />
+            <PropertyCard key={index} property={house} onPress={setSelectedHouse} />
           ))
         ) : (
           <View style={styles.noResultsContainer}>
@@ -403,7 +415,7 @@ const SearchScreen = () => {
 
       <PropertyDetailsModal
         visible={selectedHouse !== null}
-        house={selectedHouse}
+        property={selectedHouse}
         onClose={() => setSelectedHouse(null)}
       />
 

@@ -1,6 +1,6 @@
-import { House } from "@/types";
+import { Property } from "@/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -11,24 +11,31 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import BookingModal from "./BookingModal";
 
 interface PropertyDetailsModalProps {
   visible: boolean;
-  house: House | null;
+  property: Property | null;
   onClose: () => void;
 }
 
 const screenWidth = Dimensions.get("window").width;
 
-const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ visible, house, onClose }) => {
-  const imageSources = useMemo(() => {
-    if (!house) return [] as any[];
-    const flat = house.photos.flatMap((p) => p.src);
-    // Only keep non-string entries to avoid dynamic require issues
-    return flat.filter((s) => typeof s !== "string");
-  }, [house]);
+const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
+  visible,
+  property,
+  onClose,
+}) => {
+  const [bookingModalVisible, setBookingModalVisible] = useState(false);
 
-  if (!house) return null;
+  const imageSources = useMemo(() => {
+    if (!property) return [] as any[];
+    const flat = property.photos.flatMap((p: any) => p.src);
+    // Only keep non-string entries to avoid dynamic require issues
+    return flat.filter((s: any) => typeof s !== "string");
+  }, [property]);
+
+  if (!property) return null;
 
   return (
     <Modal
@@ -39,9 +46,7 @@ const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ visible, ho
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {house.noOfBedrooms} Bedroom{house.noOfBedrooms > 1 ? "s" : ""} {house.type}
-          </Text>
+          <Text style={styles.title}>{property.title}</Text>
           <TouchableOpacity
             onPress={onClose}
             accessibilityRole="button"
@@ -72,33 +77,56 @@ const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ visible, ho
 
           <View style={styles.priceRow}>
             <Text style={styles.priceText}>
-              K{house.price / 100}
-              {house.rate ? house.rate : ""}
+              K{property.price / 100}
+              {property.rate ? property.rate : ""}
             </Text>
             <View style={styles.listingPill}>
-              <Text style={styles.listingPillText}>{house.listing}</Text>
+              <Text style={styles.listingPillText}>{property.listing}</Text>
             </View>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location-sharp" size={18} color="#4CAF50" />
             <Text style={styles.locationText}>
-              {house.area}, {house.town}
+              {property.area}, {property.town}
             </Text>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Features</Text>
             <View style={styles.featuresContainer}>
-              {house.features.map((feature, index) => (
+              {property.features.map((feature: string, index: number) => (
                 <View key={index} style={styles.featureChip}>
                   <Text style={styles.featureText}>{feature}</Text>
                 </View>
               ))}
             </View>
           </View>
+
+          {/* Booking Button */}
+          <View style={styles.bookingSection}>
+            <TouchableOpacity
+              style={styles.bookButton}
+              onPress={() => setBookingModalVisible(true)}
+            >
+              <Ionicons name="calendar-outline" size={20} color="#fff" />
+              <Text style={styles.bookButtonText}>Book a Viewing</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </View>
+
+      {/* Booking Modal */}
+      <BookingModal
+        visible={bookingModalVisible}
+        onClose={() => setBookingModalVisible(false)}
+        property={property}
+        onBookingSuccess={() => {
+          setBookingModalVisible(false);
+          // Optionally close the property details modal as well
+          // onClose();
+        }}
+      />
     </Modal>
   );
 };
@@ -205,5 +233,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#4CAF50",
     fontWeight: "500",
+  },
+  bookingSection: {
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 20,
+  },
+  bookButton: {
+    backgroundColor: "#4CAF50",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  bookButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
   },
 });

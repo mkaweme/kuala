@@ -1,10 +1,12 @@
 import { View } from "@/components/Themed";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
+import { ProfileService } from "@/services/profileService";
 import { ProfileType, UserProfile } from "@/types/auth";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -19,11 +21,14 @@ const ProfileScreen = () => {
   const { colorScheme, setColorScheme, colors } = useColorScheme();
   const [profileType, setProfileType] = useState<ProfileType>("tenant");
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
     id: "",
     userId: user?.id || "",
     profileType: "tenant",
     firstName: user?.email?.split("@")[0] || "",
+    middleName: "",
     lastName: "",
     phone: "",
     bio: "",
@@ -33,102 +38,80 @@ const ProfileScreen = () => {
     updatedAt: new Date().toISOString(),
   });
 
+  // Load profile from database on component mount
+  useEffect(() => {
+    if (user?.id) {
+      loadProfile();
+    }
+  }, [user?.id]);
+
+  const loadProfile = async () => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    try {
+      const userProfile = await ProfileService.getProfile(user.id);
+      console.log("User Profile:", userProfile);
+      if (userProfile) {
+        setProfile(userProfile);
+        setProfileType(userProfile.profileType);
+      } else {
+        // Create initial profile if none exists
+        const initialProfile = await ProfileService.createInitialProfile(user.id, user.email || "");
+        if (initialProfile) {
+          setProfile(initialProfile);
+          setProfileType(initialProfile.profileType);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      Alert.alert("Error", "Failed to load profile");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveProfile = async () => {
+    console.log("User", user?.id);
+    if (!user?.id) return;
+
+    setIsSaving(true);
+    try {
+      const profileData = {
+        id: user.id,
+        first_name: profile.firstName,
+        middle_name: profile.middleName,
+        last_name: profile.lastName,
+        phone: profile.phone,
+        bio: profile.bio,
+        location: profile.location,
+        role: profileType,
+        preferences: profile.preferences,
+        avatar_url: profile.avatar,
+      };
+
+      const savedProfile = await ProfileService.updateProfile(profileData);
+      if (savedProfile) {
+        setProfile(savedProfile);
+        setIsEditing(false);
+        Alert.alert("Success", "Profile saved successfully");
+      } else {
+        Alert.alert("Error", "Failed to save profile");
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      Alert.alert("Error", "Failed to save profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSignOut = async () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
       { text: "Sign Out", style: "destructive", onPress: signOut },
     ]);
   };
-
-  const renderProfileTypeSelector = () => (
-    <View style={styles.profileTypeContainer}>
-      <Text style={styles.sectionTitle}>Profile Type</Text>
-      <View style={styles.profileTypeButtons}>
-        {[
-          { type: "tenant" as ProfileType, label: "Tenant/Buyer", icon: "home-outline" },
-          { type: "landlord" as ProfileType, label: "Landlord/Seller", icon: "business-outline" },
-          { type: "agent" as ProfileType, label: "Agent", icon: "person-outline" },
-        ].map(({ type, label, icon }) => (
-          <TouchableOpacity
-            key={type}
-            style={[
-              styles.profileTypeButton,
-              profileType === type && styles.profileTypeButtonActive,
-            ]}
-            onPress={() => setProfileType(type)}
-          >
-            <Ionicons name={icon as any} size={24} color={profileType === type ? "#fff" : "#666"} />
-            <Text
-              style={[styles.profileTypeText, profileType === type && styles.profileTypeTextActive]}
-            >
-              {label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-
-  const renderBasicInfo = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Basic Information</Text>
-      <View style={styles.inputRow}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>First Name</Text>
-          <TextInput
-            style={styles.input}
-            value={profile.firstName}
-            onChangeText={(text) => setProfile({ ...profile, firstName: text })}
-            placeholder="First Name"
-            editable={isEditing}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Last Name</Text>
-          <TextInput
-            style={styles.input}
-            value={profile.lastName}
-            onChangeText={(text) => setProfile({ ...profile, lastName: text })}
-            placeholder="Last Name"
-            editable={isEditing}
-          />
-        </View>
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Phone</Text>
-        <TextInput
-          style={styles.input}
-          value={profile.phone}
-          onChangeText={(text) => setProfile({ ...profile, phone: text })}
-          placeholder="Phone Number"
-          keyboardType="phone-pad"
-          editable={isEditing}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Location</Text>
-        <TextInput
-          style={styles.input}
-          value={profile.location}
-          onChangeText={(text) => setProfile({ ...profile, location: text })}
-          placeholder="City, Country"
-          editable={isEditing}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Bio</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          value={profile.bio}
-          onChangeText={(text) => setProfile({ ...profile, bio: text })}
-          placeholder="Tell us about yourself..."
-          multiline
-          numberOfLines={3}
-          editable={isEditing}
-        />
-      </View>
-    </View>
-  );
 
   const renderTenantPreferences = () => (
     <View style={styles.section}>
@@ -354,6 +337,15 @@ const ProfileScreen = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.text }]}>Loading profile...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -380,8 +372,22 @@ const ProfileScreen = () => {
               {profileType.charAt(0).toUpperCase() + profileType.slice(1)}
             </Text>
           </View>
-          <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(!isEditing)}>
-            <Ionicons name={isEditing ? "checkmark" : "pencil"} size={24} color="#4CAF50" />
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => {
+              if (isEditing) {
+                saveProfile();
+              } else {
+                setIsEditing(true);
+              }
+            }}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color="#4CAF50" />
+            ) : (
+              <Ionicons name={isEditing ? "checkmark" : "pencil"} size={24} color="#4CAF50" />
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -405,7 +411,10 @@ const ProfileScreen = () => {
                   borderColor: colors.primary,
                 },
               ]}
-              onPress={() => setProfileType(type)}
+              onPress={() => {
+                setProfileType(type);
+                setProfile({ ...profile, profileType: type });
+              }}
             >
               <Ionicons
                 name={icon as keyof typeof Ionicons.glyphMap}
@@ -616,6 +625,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+    color: "#666",
+  },
   header: {
     backgroundColor: "#4CAF50",
     paddingTop: 60,
@@ -692,11 +711,9 @@ const styles = StyleSheet.create({
   },
   profileTypeButton: {
     flex: 1,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 5,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#e0e0e0",

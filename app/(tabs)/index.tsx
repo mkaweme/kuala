@@ -1,23 +1,26 @@
 import SittingRoom1 from "@/assets/images/1.jpg";
 import SittingRoom2 from "@/assets/images/2.jpg";
-import HouseComponent from "@/components/house";
+import DropdownMenu from "@/components/DropdownMenu";
+import PropertyCard from "@/components/PropertyCard";
 import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
-import { House } from "@/types";
+import { HouseProperty } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
-export const HOUSES: House[] = [
+export const HOUSES: HouseProperty[] = [
   {
+    id: "1",
+    title: "Modern 1 Bedroom House",
     noOfBedrooms: 1,
     area: "Woodlands",
     town: "Lusaka",
     listing: "rent",
     price: 200000,
     rate: "pm",
-    type: "House",
+    type: "house",
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -59,6 +62,8 @@ export const HOUSES: House[] = [
         src: [SittingRoom2],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     noOfBedrooms: 3,
@@ -200,6 +205,7 @@ const Home = () => {
   const { colors } = useColorScheme();
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("All");
   const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   // Filter houses based on property type only
   const filteredHouses =
@@ -212,12 +218,19 @@ const Home = () => {
       <View style={[styles.headerContainer, { backgroundColor: colors.primary }]}>
         {/* Header */}
         <View style={[styles.header, { backgroundColor: colors.primary }]}>
-          <Text style={[styles.headerTitle, { color: colors.buttonText }]}>
-            Find Your Dream Property
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: colors.buttonTextSecondary }]}>
-            Discover the perfect place
-          </Text>
+          <View style={styles.headerContent}>
+            <View style={styles.headerText}>
+              <Text style={[styles.headerTitle, { color: colors.buttonText }]}>
+                Find Your Dream Property
+              </Text>
+              <Text style={[styles.headerSubtitle, { color: colors.buttonText }]}>
+                Discover the perfect place
+              </Text>
+            </View>
+            <TouchableOpacity style={styles.menuButton} onPress={() => setDropdownVisible(true)}>
+              <Ionicons name="menu" size={24} color={colors.buttonText} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Search Bar */}
@@ -280,14 +293,15 @@ const Home = () => {
         contentContainerStyle={styles.propertiesContent}
       >
         {filteredHouses.map((house, index) => (
-          <HouseComponent key={index} house={house} onPress={setSelectedHouse} />
+          <PropertyCard key={index} property={house} onPress={setSelectedHouse} />
         ))}
       </ScrollView>
       <PropertyDetailsModal
         visible={selectedHouse !== null}
-        house={selectedHouse}
+        property={selectedHouse}
         onClose={() => setSelectedHouse(null)}
       />
+      <DropdownMenu visible={dropdownVisible} onClose={() => setDropdownVisible(false)} />
     </ScrollView>
   );
 };
@@ -305,6 +319,18 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: "#4CAF50",
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  headerText: {
+    flex: 1,
+  },
+  menuButton: {
+    padding: 8,
+    marginTop: 4,
   },
   headerTitle: {
     fontSize: 28,

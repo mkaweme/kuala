@@ -8,6 +8,7 @@ import {
   TextInput as DefaultTextInput,
   View as DefaultView,
 } from "react-native";
+import React from "react";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
