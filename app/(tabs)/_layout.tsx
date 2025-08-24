@@ -60,10 +60,41 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="createListing"
+        options={{
+          title: "Create",
+          tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="watchlist"
+        options={{
+          title: "Watchlist",
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
+          href: null, // Hide from tab bar, accessible via dropdown
+        }}
+      />
+      <Tabs.Screen
+        name="myBookings"
+        options={{
+          title: "My Bookings",
+          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+          href: null, // Hide from tab bar, accessible via dropdown
+        }}
+      />
+      <Tabs.Screen
+        name="viewings"
+        options={{
+          title: "Viewings",
+          tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
+          href: null, // Hide from tab bar, accessible via dropdown
         }}
       />
     </Tabs>
