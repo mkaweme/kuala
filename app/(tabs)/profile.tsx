@@ -114,13 +114,13 @@ const ProfileScreen = () => {
   };
 
   const renderTenantPreferences = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Property Preferences</Text>
+    <View style={{ ...styles.section, backgroundColor: colors.card }}>
+      <Text style={{ ...styles.sectionTitle, color: colors.text }}>Property Preferences</Text>
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Min Budget</Text>
           <TextInput
-            style={styles.input}
+            style={{ ...styles.input, backgroundColor: colors.card }}
             value={profile.preferences?.budget?.min?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -142,7 +142,7 @@ const ProfileScreen = () => {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Max Budget</Text>
           <TextInput
-            style={styles.input}
+            style={{ ...styles.input, backgroundColor: colors.card }}
             value={profile.preferences?.budget?.max?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -166,7 +166,7 @@ const ProfileScreen = () => {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Min Bedrooms</Text>
           <TextInput
-            style={styles.input}
+            style={{ ...styles.input, backgroundColor: colors.card }}
             value={profile.preferences?.bedrooms?.min?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -188,7 +188,7 @@ const ProfileScreen = () => {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Max Bedrooms</Text>
           <TextInput
-            style={styles.input}
+            style={{ ...styles.input, backgroundColor: colors.card }}
             value={profile.preferences?.bedrooms?.max?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -364,10 +364,10 @@ const ProfileScreen = () => {
             )}
           </View>
           <View style={styles.headerInfo}>
-            <Text style={styles.userName}>
+            <Text style={{ ...styles.userName, color: colors.text }}>
               {profile.firstName} {profile.lastName}
             </Text>
-            <Text style={styles.userEmail}>{user?.email}</Text>
+            <Text style={{ ...styles.userEmail, color: colors.text }}>{user?.email}</Text>
             <Text style={styles.profileTypeBadge}>
               {profileType.charAt(0).toUpperCase() + profileType.slice(1)}
             </Text>
@@ -397,8 +397,10 @@ const ProfileScreen = () => {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile Type</Text>
         <View style={styles.profileTypeButtons}>
           {[
-            { type: "tenant" as ProfileType, label: "Tenant/Buyer", icon: "home-outline" },
-            { type: "landlord" as ProfileType, label: "Landlord/Seller", icon: "business-outline" },
+            { type: "tenant" as ProfileType, label: "Tenant", icon: "home-outline" },
+            { type: "buyer" as ProfileType, label: "Buyer", icon: "home-outline" },
+            { type: "seller" as ProfileType, label: "seller", icon: "home-outline" },
+            { type: "landlord" as ProfileType, label: "Landlord", icon: "business-outline" },
             { type: "agent" as ProfileType, label: "Agent", icon: "person-outline" },
           ].map(({ type, label, icon }) => (
             <TouchableOpacity
@@ -438,44 +440,62 @@ const ProfileScreen = () => {
       {/* Basic Information */}
       <View style={[styles.section, { backgroundColor: colors.card }]}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Basic Information</Text>
-        <View style={styles.inputRow}>
-          <View style={styles.inputContainer}>
-            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>First Name</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.inputBackground,
-                  borderColor: colors.inputBorder,
-                  color: colors.text,
-                },
-              ]}
-              value={profile.firstName}
-              onChangeText={(text) => setProfile({ ...profile, firstName: text })}
-              placeholder="First Name"
-              placeholderTextColor={colors.inputPlaceholder}
-              editable={isEditing}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Last Name</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.inputBackground,
-                  borderColor: colors.inputBorder,
-                  color: colors.text,
-                },
-              ]}
-              value={profile.lastName}
-              onChangeText={(text) => setProfile({ ...profile, lastName: text })}
-              placeholder="Last Name"
-              placeholderTextColor={colors.inputPlaceholder}
-              editable={isEditing}
-            />
-          </View>
+        {/* <View style={styles.inputRow}> */}
+        <View style={styles.inputContainer}>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>First Name</Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.inputBackground,
+                borderColor: colors.inputBorder,
+                color: colors.text,
+              },
+            ]}
+            value={profile.firstName}
+            onChangeText={(text) => setProfile({ ...profile, firstName: text })}
+            placeholder="First Name"
+            placeholderTextColor={colors.inputPlaceholder}
+            editable={isEditing}
+          />
         </View>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Middle Name</Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.inputBackground,
+                borderColor: colors.inputBorder,
+                color: colors.text,
+              },
+            ]}
+            value={profile.middleName}
+            onChangeText={(text) => setProfile({ ...profile, middleName: text })}
+            placeholder="Middle Name"
+            placeholderTextColor={colors.inputPlaceholder}
+            editable={isEditing}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Last Name</Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.inputBackground,
+                borderColor: colors.inputBorder,
+                color: colors.text,
+              },
+            ]}
+            value={profile.lastName}
+            onChangeText={(text) => setProfile({ ...profile, lastName: text })}
+            placeholder="Last Name"
+            placeholderTextColor={colors.inputPlaceholder}
+            editable={isEditing}
+          />
+        </View>
+        {/* </View> */}
         <View style={styles.inputContainer}>
           <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Phone</Text>
           <TextInput
@@ -707,13 +727,13 @@ const styles = StyleSheet.create({
   },
   profileTypeButtons: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   profileTypeButton: {
-    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 5,
+    padding: 5,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#e0e0e0",
