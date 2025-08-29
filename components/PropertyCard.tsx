@@ -19,6 +19,44 @@ import {
   View,
 } from "react-native";
 
+// Image mapping utility function
+const getImageSource = (imageId: string) => {
+  const imageMap: { [key: string]: any } = {
+    "1": require("@/assets/images/1.jpg"),
+    "2": require("@/assets/images/2.jpg"),
+    "3": require("@/assets/images/3.jpg"),
+    "4": require("@/assets/images/4.jpg"),
+    "5": require("@/assets/images/5.jpg"),
+    "6": require("@/assets/images/6.jpg"),
+    "7": require("@/assets/images/7.jpg"),
+    "8": require("@/assets/images/8.jpg"),
+    "9": require("@/assets/images/9.jpg"),
+    "10": require("@/assets/images/10.jpg"),
+    "11": require("@/assets/images/11.jpg"),
+    "12": require("@/assets/images/12.jpg"),
+    "13": require("@/assets/images/13.jpg"),
+    "14": require("@/assets/images/14.jpg"),
+    "15": require("@/assets/images/15.jpg"),
+    "16": require("@/assets/images/16.jpg"),
+    "17": require("@/assets/images/17.jpg"),
+    "18": require("@/assets/images/18.jpg"),
+    "19": require("@/assets/images/19.jpg"),
+    "20": require("@/assets/images/20.jpg"),
+    "21": require("@/assets/images/21.jpg"),
+    "22": require("@/assets/images/22.jpg"),
+    "23": require("@/assets/images/23.jpg"),
+    "24": require("@/assets/images/24.jpg"),
+    "25": require("@/assets/images/25.jpg"),
+    "26": require("@/assets/images/26.jpg"),
+    "27": require("@/assets/images/27.jpg"),
+    "28": require("@/assets/images/28.jpg"),
+    "29": require("@/assets/images/29.jpg"),
+    "30": require("@/assets/images/30.jpg"),
+  };
+
+  return imageMap[imageId] || require("@/assets/images/1.jpg");
+};
+
 interface PropertyCardProps {
   property: Property;
   onPress?: (property: Property) => void;
@@ -133,7 +171,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         if (isWarehouseProperty(property)) {
           return (
             <Text style={styles.bedroomsText}>
-              {property.squareFootage} sq ft Warehouse
+              {property.squareMeters} sqm Warehouse
               {property.loadingDock && " • Loading Dock"}
             </Text>
           );
@@ -172,7 +210,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <View style={styles.propertyContainer}>
           <View style={styles.imageContainer}>
             <Image
-              source={property.photos[0].src[0] as any}
+              source={getImageSource(property.photos[0].src[0])}
               style={styles.image}
               resizeMode="cover"
             />
@@ -189,7 +227,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
             {/* Property Type Icon */}
             <View style={styles.propertyTypeTag}>
-              <Ionicons name={getPropertyTypeIcon() as any} size={16} color="#ffffff" />
+              <Ionicons name={getPropertyTypeIcon()} size={16} color="#ffffff" />
             </View>
 
             {/* Favorite Button */}
@@ -263,11 +301,11 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 250,
+    height: 270,
   },
   priceTag: {
     position: "absolute",
-    top: 15,
+    bottom: 15,
     right: 15,
     backgroundColor: "#4CAF50",
     paddingHorizontal: 12,
@@ -357,7 +395,7 @@ const styles = StyleSheet.create({
   favoriteButton: {
     position: "absolute",
     top: 15,
-    right: 80,
+    right: 15,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     paddingHorizontal: 10,
     paddingVertical: 8,
