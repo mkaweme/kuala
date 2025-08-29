@@ -1,17 +1,20 @@
 import { ListingType, PropertyType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import React, { useState } from "react";
+import MapView, { Marker } from "react-native-maps";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface PhotoWithCaption {
@@ -64,6 +67,7 @@ interface CreateListingForm {
 }
 
 const CreateListingScreen = () => {
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [form, setForm] = useState<CreateListingForm>({
     propertyType: "house",
     title: "",
@@ -80,9 +84,36 @@ const CreateListingScreen = () => {
       longitude: 28.3228,
     },
   });
-
   const [currentFeature, setCurrentFeature] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const getLocationPersmission = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
+      return;
+    }
+    const userLocation = await Location.getCurrentPositionAsync({});
+    setLocation(userLocation.coords);
+  };
+
+
+  //Define a function that fetches the delivery route and calculates the distance
+  // const fetchRoute = async () => {
+  //   if (!location) return;
+  //   try {
+  //     const origin = `${-15.3339709},${28.3523437}`;
+  //     const destination = `${location.latitude},${location.longitude}`;
+  //     const apiKey = Constants.expoConfig?.extra?.googleMapsApiKey;
+  //     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=
+  //     ${origin}&destination=${destination}&key=${apiKey}`;
+
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+  //   } catch (error) {
+  //     console.error("Error fetching route:", error);
+  //   }
+  // };
 
   const propertyTypes: { value: PropertyType; label: string; icon: string }[] = [
     { value: "house", label: "House", icon: "home-outline" },
@@ -99,6 +130,7 @@ const CreateListingScreen = () => {
   ];
 
   const rateTypes = [
+    { value: "pyr", label: "Per Year" },
     { value: "pm", label: "Per Month" },
     { value: "pw", label: "Per Week" },
     { value: "pd", label: "Per Day" },
@@ -107,46 +139,44 @@ const CreateListingScreen = () => {
 
   const handlePhotoUpload = async () => {
     Alert.alert(
-      "Photo Upload", 
+      "Photo Upload",
       "Photo upload functionality will be available after installing expo-image-picker. For now, you can add a placeholder photo URL.",
       [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Add Placeholder", 
+        {
+          text: "Add Placeholder",
           onPress: () => {
             const newPhoto: PhotoWithCaption = {
               uri: "https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Property+Photo",
               caption: "Sample Photo",
             };
-            setForm(prev => ({
+            setForm((prev) => ({
               ...prev,
               photos: [...prev.photos, newPhoto],
             }));
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
   const removePhoto = (index: number) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       photos: prev.photos.filter((_, i) => i !== index),
     }));
   };
 
   const updatePhotoCaption = (index: number, caption: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      photos: prev.photos.map((photo, i) =>
-        i === index ? { ...photo, caption } : photo
-      ),
+      photos: prev.photos.map((photo, i) => (i === index ? { ...photo, caption } : photo)),
     }));
   };
 
   const addFeature = () => {
     if (currentFeature.trim()) {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
         features: [...prev.features, currentFeature.trim()],
       }));
@@ -155,14 +185,14 @@ const CreateListingScreen = () => {
   };
 
   const removeFeature = (index: number) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       features: prev.features.filter((_, i) => i !== index),
     }));
   };
 
   const updateLocation = (latitude: number, longitude: number) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       location: { latitude, longitude },
     }));
@@ -180,7 +210,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.noOfBedrooms}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, noOfBedrooms: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, noOfBedrooms: text }))}
                   placeholder="3"
                   keyboardType="numeric"
                 />
@@ -190,7 +220,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.noOfBathrooms}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, noOfBathrooms: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, noOfBathrooms: text }))}
                   placeholder="2"
                   keyboardType="numeric"
                 />
@@ -202,7 +232,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.squareFootage}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, squareFootage: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
                   placeholder="1500"
                   keyboardType="numeric"
                 />
@@ -211,7 +241,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasGarden && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasGarden: !prev.hasGarden }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasGarden: !prev.hasGarden }))}
               >
                 {form.hasGarden && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -220,7 +250,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasParking && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasParking: !prev.hasParking }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasParking: !prev.hasParking }))}
               >
                 {form.hasParking && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -235,11 +265,11 @@ const CreateListingScreen = () => {
             <Text style={styles.fieldGroupTitle}>Office Details</Text>
             <View style={styles.row}>
               <View style={styles.halfField}>
-                <Text style={styles.label}>Square Footage</Text>
+                <Text style={styles.label}>Square Meters</Text>
                 <TextInput
                   style={styles.input}
                   value={form.squareFootage}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, squareFootage: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
                   placeholder="2000"
                   keyboardType="numeric"
                 />
@@ -249,7 +279,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.floorNumber}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, floorNumber: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, floorNumber: text }))}
                   placeholder="1"
                   keyboardType="numeric"
                 />
@@ -261,7 +291,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.hasMeetingRooms}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, hasMeetingRooms: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, hasMeetingRooms: text }))}
                   placeholder="2"
                   keyboardType="numeric"
                 />
@@ -271,7 +301,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.parkingSpaces}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, parkingSpaces: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, parkingSpaces: text }))}
                   placeholder="5"
                   keyboardType="numeric"
                 />
@@ -280,7 +310,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasReception && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasReception: !prev.hasReception }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasReception: !prev.hasReception }))}
               >
                 {form.hasReception && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -299,7 +329,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.squareFootage}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, squareFootage: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
                   placeholder="5000"
                   keyboardType="numeric"
                 />
@@ -309,7 +339,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.zoning}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, zoning: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, zoning: text }))}
                   placeholder="Residential"
                 />
               </View>
@@ -320,7 +350,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.terrain}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, terrain: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, terrain: text }))}
                   placeholder="Flat"
                 />
               </View>
@@ -328,7 +358,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasUtilities && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasUtilities: !prev.hasUtilities }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasUtilities: !prev.hasUtilities }))}
               >
                 {form.hasUtilities && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -337,7 +367,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.roadAccess && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, roadAccess: !prev.roadAccess }))}
+                onPress={() => setForm((prev) => ({ ...prev, roadAccess: !prev.roadAccess }))}
               >
                 {form.roadAccess && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -356,7 +386,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.acreage}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, acreage: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, acreage: text }))}
                   placeholder="50"
                   keyboardType="numeric"
                 />
@@ -366,7 +396,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.soilType}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, soilType: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, soilType: text }))}
                   placeholder="Loam"
                 />
               </View>
@@ -374,7 +404,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasWater && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasWater: !prev.hasWater }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasWater: !prev.hasWater }))}
               >
                 {form.hasWater && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -383,7 +413,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasBuildings && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasBuildings: !prev.hasBuildings }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasBuildings: !prev.hasBuildings }))}
               >
                 {form.hasBuildings && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -402,7 +432,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.squareFootage}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, squareFootage: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
                   placeholder="10000"
                   keyboardType="numeric"
                 />
@@ -412,7 +442,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.ceilingHeight}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, ceilingHeight: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, ceilingHeight: text }))}
                   placeholder="20"
                   keyboardType="numeric"
                 />
@@ -421,7 +451,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.loadingDock && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, loadingDock: !prev.loadingDock }))}
+                onPress={() => setForm((prev) => ({ ...prev, loadingDock: !prev.loadingDock }))}
               >
                 {form.loadingDock && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -430,7 +460,9 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasOfficeSpace && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasOfficeSpace: !prev.hasOfficeSpace }))}
+                onPress={() =>
+                  setForm((prev) => ({ ...prev, hasOfficeSpace: !prev.hasOfficeSpace }))
+                }
               >
                 {form.hasOfficeSpace && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -439,7 +471,7 @@ const CreateListingScreen = () => {
             <View style={styles.checkboxRow}>
               <TouchableOpacity
                 style={[styles.checkbox, form.hasSecurity && styles.checkboxChecked]}
-                onPress={() => setForm(prev => ({ ...prev, hasSecurity: !prev.hasSecurity }))}
+                onPress={() => setForm((prev) => ({ ...prev, hasSecurity: !prev.hasSecurity }))}
               >
                 {form.hasSecurity && <Ionicons name="checkmark" size={16} color="#fff" />}
               </TouchableOpacity>
@@ -465,16 +497,14 @@ const CreateListingScreen = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Here you would typically send the data to your backend
       // For now, we'll just show a success message
-      Alert.alert(
-        "Success!",
-        "Your property listing has been created successfully!",
-        [{ text: "OK", onPress: () => console.log("Listing created") }]
-      );
-      
+      Alert.alert("Success!", "Your property listing has been created successfully!", [
+        { text: "OK", onPress: () => console.log("Listing created") },
+      ]);
+
       // Reset form
       setForm({
         propertyType: "house",
@@ -493,7 +523,7 @@ const CreateListingScreen = () => {
         },
       });
     } catch (error) {
-      Alert.alert("Error", "Failed to create listing. Please try again.");
+      Alert.alert("Error", "Failed to create listing.");
     } finally {
       setIsSubmitting(false);
     }
@@ -522,7 +552,7 @@ const CreateListingScreen = () => {
                     styles.propertyTypeButton,
                     form.propertyType === type.value && styles.propertyTypeButtonActive,
                   ]}
-                  onPress={() => setForm(prev => ({ ...prev, propertyType: type.value }))}
+                  onPress={() => setForm((prev) => ({ ...prev, propertyType: type.value }))}
                 >
                   <Ionicons
                     name={type.icon as any}
@@ -549,7 +579,7 @@ const CreateListingScreen = () => {
             <TextInput
               style={styles.input}
               value={form.title}
-              onChangeText={(text) => setForm(prev => ({ ...prev, title: text }))}
+              onChangeText={(text) => setForm((prev) => ({ ...prev, title: text }))}
               placeholder="e.g., Modern 3 Bedroom House in Woodlands"
             />
 
@@ -557,7 +587,7 @@ const CreateListingScreen = () => {
             <TextInput
               style={[styles.input, styles.textArea]}
               value={form.description}
-              onChangeText={(text) => setForm(prev => ({ ...prev, description: text }))}
+              onChangeText={(text) => setForm((prev) => ({ ...prev, description: text }))}
               placeholder="Describe your property in detail..."
               multiline
               numberOfLines={4}
@@ -569,7 +599,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.price}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, price: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, price: text }))}
                   placeholder="500000"
                   keyboardType="numeric"
                 />
@@ -579,7 +609,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.rate}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, rate: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, rate: text }))}
                   placeholder="pm (per month)"
                 />
               </View>
@@ -591,7 +621,9 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.listing}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, listing: text as ListingType }))}
+                  onChangeText={(text) =>
+                    setForm((prev) => ({ ...prev, listing: text as ListingType }))
+                  }
                   placeholder="rent, sale, or lease"
                 />
               </View>
@@ -610,7 +642,7 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.area}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, area: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, area: text }))}
                   placeholder="e.g., Woodlands"
                 />
               </View>
@@ -619,35 +651,14 @@ const CreateListingScreen = () => {
                 <TextInput
                   style={styles.input}
                   value={form.town}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, town: text }))}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, town: text }))}
                   placeholder="e.g., Lusaka"
                 />
               </View>
             </View>
 
             <Text style={styles.label}>Map Location</Text>
-            <TouchableOpacity
-              style={styles.mapButton}
-              onPress={() => {
-                Alert.alert(
-                  "Map Integration", 
-                  "Map functionality will be available after installing react-native-maps. For now, you can manually enter coordinates.",
-                  [
-                    { text: "Cancel", style: "cancel" },
-                    { 
-                      text: "Enter Coordinates", 
-                      onPress: () => {
-                        // For now, just show current coordinates
-                        Alert.alert(
-                          "Current Location", 
-                          `Latitude: ${form.location.latitude.toFixed(4)}\nLongitude: ${form.location.longitude.toFixed(4)}`
-                        );
-                      }
-                    }
-                  ]
-                );
-              }}
-            >
+            <TouchableOpacity style={styles.mapButton} onPressIn={() => getLocationPersmission()}>
               <Ionicons name="map-outline" size={20} color="#4CAF50" />
               <Text style={styles.mapButtonText}>Select Location on Map</Text>
             </TouchableOpacity>
@@ -655,7 +666,44 @@ const CreateListingScreen = () => {
               Lat: {form.location.latitude.toFixed(4)}, Long: {form.location.longitude.toFixed(4)}
             </Text>
           </View>
-
+          <Modal>
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: location ? location.latitude : 0,
+                longitude: location ? location.longitude : 0,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              onPress={(e) =>
+                setLocation({
+                  ...e.nativeEvent.coordinate,
+                  altitude: 0,
+                  accuracy: 0,
+                  altitudeAccuracy: 0,
+                  heading: 0,
+                  speed: 0,
+                })
+              }
+            >
+              {location && (
+                <Marker
+                  coordinate={location}
+                  draggable
+                  onDragEnd={(e) =>
+                    setLocation({
+                      ...e.nativeEvent.coordinate,
+                      altitude: 0,
+                      accuracy: 0,
+                      altitudeAccuracy: 0,
+                      heading: 0,
+                      speed: 0,
+                    })
+                  }
+                />
+              )}
+            </MapView>
+          </Modal>
           {/* Features */}
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldGroupTitle}>Features</Text>
@@ -884,6 +932,10 @@ const styles = StyleSheet.create({
     color: "#666",
     fontFamily: "monospace",
   },
+  map: {
+    width: "100%",
+    height: 400,
+  },
   featureInput: {
     flexDirection: "row",
     gap: 12,
@@ -977,5 +1029,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
-
 });
