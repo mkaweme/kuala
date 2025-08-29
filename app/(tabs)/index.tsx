@@ -1,11 +1,9 @@
-import SittingRoom1 from "@/assets/images/1.jpg";
-import SittingRoom2 from "@/assets/images/2.jpg";
 import DropdownMenu from "@/components/DropdownMenu";
 import PropertyCard from "@/components/PropertyCard";
 import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
-import { HouseProperty } from "@/types";
+import { HouseProperty, WarehouseProperty } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
@@ -31,91 +29,97 @@ export const HOUSES: HouseProperty[] = [
     photos: [
       {
         name: "Sitting Room",
-        src: [SittingRoom1, SittingRoom2],
+        src: ["1", "2"],
       },
       {
         name: "Kitchen",
-        src: [SittingRoom1, SittingRoom2],
+        src: ["1", "2"],
       },
       {
         name: "Toilet",
-        src: [`require("@/assets/images/5.jpg")`],
+        src: ["5"],
       },
       {
         name: "Bathroom",
-        src: [SittingRoom1],
+        src: ["1"],
       },
       {
         name: "Front",
-        src: [SittingRoom1],
+        src: ["1"],
       },
       {
         name: "Bedroom",
-        src: [SittingRoom2],
+        src: ["2"],
       },
       {
         name: "Back",
-        src: [SittingRoom1],
+        src: ["1"],
       },
       {
         name: "Yard",
-        src: [SittingRoom2],
+        src: ["2"],
       },
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
+    id: "2",
     noOfBedrooms: 3,
     area: "Ibex Hill",
+    title: "Spacious 3 Bedroomed House",
     town: "Lusaka",
     listing: "rent",
     price: 500000,
     rate: "pm",
-    type: "House",
+    type: "house",
     features: ["Tiles", "Built-In Kitchen Units", "Built-In Wardrobes", "Paved Yard"],
     photos: [
       {
         name: "Sitting Room",
-        src: [SittingRoom1, SittingRoom2],
+        src: ["1", "2"],
       },
       {
         name: "Kitchen",
-        src: [SittingRoom1, SittingRoom2],
+        src: ["1", "2"],
       },
       {
         name: "Toilet",
-        src: [SittingRoom1],
+        src: ["1"],
       },
       {
         name: "Bathroom",
-        src: ["@/assets/images/6.jpg"],
+        src: ["6"],
       },
       {
         name: "Front",
-        src: ["@/assets/images/7.jpg"],
+        src: ["7"],
       },
       {
         name: "Bedroom",
-        src: ["@/assets/images/8.jpg"],
+        src: ["8"],
       },
       {
         name: "Back",
-        src: ["@/assets/images/9.jpg"],
+        src: ["9"],
       },
       {
         name: "Yard",
-        src: ["@/assets/images/10.jpg"],
+        src: ["10"],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
+    id: "3",
     noOfBedrooms: 3,
     area: "Meanwood Chamba Valley",
+    title: "Modern 4 bedroomed House",
     town: "Lusaka",
     listing: "sale",
     price: 90000000,
-    type: "House",
+    type: "house",
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -130,72 +134,84 @@ export const HOUSES: HouseProperty[] = [
     photos: [
       {
         name: "Sitting Room",
-        src: [SittingRoom2, SittingRoom1],
+        src: ["2", "1"],
       },
       {
         name: "Kitchen",
-        src: ["@/assets/images/3.jpg", "@/assets/images/4.jpg"],
+        src: ["3", "4"],
       },
       {
         name: "Toilet",
-        src: ["@/assets/images/5.jpg"],
+        src: ["5"],
       },
       {
         name: "Bathroom",
-        src: ["@/assets/images/6.jpg"],
+        src: ["6"],
       },
       {
         name: "Front",
-        src: ["@/assets/images/7.jpg"],
+        src: ["7"],
       },
       {
         name: "Master Bedroom",
-        src: ["@/assets/images/8.jpg"],
+        src: ["8"],
       },
       {
         name: "Bedroom",
-        src: ["@/assets/images/8.jpg"],
+        src: ["8"],
       },
       {
         name: "Bedroom",
-        src: ["@/assets/images/8.jpg"],
+        src: ["8"],
       },
       {
         name: "Back",
-        src: ["@/assets/images/9.jpg"],
+        src: ["9"],
       },
       {
         name: "Yard",
-        src: ["@/assets/images/10.jpg"],
+        src: ["10"],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
+];
+
+const WAREHOUSES: WarehouseProperty[] = [
   {
-    noOfBedrooms: 3,
+    id: "4",
+    title: "Large Warehouse",
     area: "Chinika",
     town: "Lusaka",
+    price: 12000000,
+    rate: "yr",
     listing: "lease",
-    price: 150000000,
-    type: "Warehouse",
+    type: "warehouse",
     features: ["Road Frontage", "Overhead Crane"],
     photos: [
       {
         name: "Yard",
-        src: [SittingRoom2, SittingRoom1],
+        src: ["2", "1"],
       },
       {
         name: "Entrance",
-        src: [SittingRoom2, SittingRoom1],
+        src: ["2", "1"],
       },
       {
         name: "Offices",
-        src: [SittingRoom2, SittingRoom1],
+        src: ["2", "1"],
       },
       {
         name: "Bathroom",
-        src: [SittingRoom2, SittingRoom1],
+        src: ["2", "1"],
       },
     ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    squareMeters: 2400,
+    ceilingHeight: 12,
+    loadingDock: false,
   },
 ];
 
@@ -204,7 +220,7 @@ const propertyTypes = ["All", "House", "Office", "Plot", "Farm", "Warehouse"];
 const Home = () => {
   const { colors } = useColorScheme();
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("All");
-  const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
+  const [selectedHouse, setSelectedHouse] = useState<HouseProperty | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   // Filter houses based on property type only
@@ -285,7 +301,7 @@ const Home = () => {
           {filteredHouses.length} {filteredHouses.length === 1 ? "property" : "properties"} found
         </Text>
       </View>
-
+      {/* Sample Image elements removed; PropertyCard handles image rendering via IDs */}
       {/* Properties List */}
       <ScrollView
         style={styles.propertiesContainer}
@@ -293,7 +309,18 @@ const Home = () => {
         contentContainerStyle={styles.propertiesContent}
       >
         {filteredHouses.map((house, index) => (
-          <PropertyCard key={index} property={house} onPress={setSelectedHouse} />
+          <PropertyCard
+            key={index}
+            property={house}
+            onPress={(property) => setSelectedHouse(property as HouseProperty)}
+          />
+        ))}
+        {WAREHOUSES.map((warehouse, index) => (
+          <PropertyCard
+            key={index}
+            property={warehouse}
+            onPress={(property) => setSelectedHouse(property as HouseProperty)}
+          />
         ))}
       </ScrollView>
       <PropertyDetailsModal
