@@ -66,7 +66,7 @@ export interface FarmProperty extends BaseProperty {
 // Warehouse-specific properties
 export interface WarehouseProperty extends BaseProperty {
   type: "warehouse";
-  squareFootage: number;
+  squareMeters: number;
   ceilingHeight: number;
   loadingDock: boolean;
   hasOfficeSpace?: boolean;
