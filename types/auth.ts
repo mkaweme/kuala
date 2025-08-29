@@ -1,4 +1,4 @@
-export type ProfileType = "tenant" | "landlord" | "agent";
+export type ProfileType = "tenant" | "buyer" | "landlord" | "seller" | "agent";
 
 export interface UserProfile {
   id: string;
