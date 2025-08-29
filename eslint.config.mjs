@@ -13,4 +13,10 @@ export default [
   pluginReact.configs.flat.recommended,
   configPrettier,
   pluginPrettierRecommended,
+  {
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-var-requires": "off",
+    },
+  },
 ];
