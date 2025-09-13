@@ -1,8 +1,7 @@
 import { ListingType, PropertyType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import React, { useState } from "react";
-import MapView, { Marker } from "react-native-maps";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -16,6 +15,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import MapView, {PROVIDER_GOOGLE, Marker } from "react-native-maps";
+// import Constants from "expo-constants";
 
 interface PhotoWithCaption {
   uri: string;
@@ -67,6 +68,7 @@ interface CreateListingForm {
 }
 
 const CreateListingScreen = () => {
+  // const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [form, setForm] = useState<CreateListingForm>({
     propertyType: "house",
@@ -86,17 +88,34 @@ const CreateListingScreen = () => {
   });
   const [currentFeature, setCurrentFeature] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const getLocationPersmission = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission to access location was denied");
-      return;
+  // const getLocationPersmission = async () => {
+  //   const { status } = await Location.requestForegroundPermissionsAsync();
+  //   console.log("Permission status", status);
+  //   if (status !== "granted") {
+  //     alert("Permission to access location was denied");
+  //     return;
+  //   }
+  //   const userLocation = await Location.getCurrentPositionAsync({});
+  //   setLocation(userLocation.coords);
+  //   setIsModalOpen(false);
+  // };
+
+  useEffect(() => {
+    async function getCurrentLocation() {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      setLocation(location.coords);
     }
-    const userLocation = await Location.getCurrentPositionAsync({});
-    setLocation(userLocation.coords);
-  };
 
+    getCurrentLocation();
+  }, []);
 
   //Define a function that fetches the delivery route and calculates the distance
   // const fetchRoute = async () => {
@@ -110,6 +129,10 @@ const CreateListingScreen = () => {
 
   //     const response = await fetch(url);
   //     const data = await response.json();
+
+  //     if (data.routes.length) {
+  //       console.log("Data :", data);
+  //     }
   //   } catch (error) {
   //     console.error("Error fetching route:", error);
   //   }
@@ -523,7 +546,7 @@ const CreateListingScreen = () => {
         },
       });
     } catch (error) {
-      Alert.alert("Error", "Failed to create listing.");
+      Alert.alert("Error", "Failed to create listing." + error);
     } finally {
       setIsSubmitting(false);
     }
@@ -658,7 +681,7 @@ const CreateListingScreen = () => {
             </View>
 
             <Text style={styles.label}>Map Location</Text>
-            <TouchableOpacity style={styles.mapButton} onPressIn={() => getLocationPersmission()}>
+            <TouchableOpacity style={styles.mapButton} onPressIn={() => setIsModalOpen(true)}>
               <Ionicons name="map-outline" size={20} color="#4CAF50" />
               <Text style={styles.mapButtonText}>Select Location on Map</Text>
             </TouchableOpacity>
@@ -666,44 +689,79 @@ const CreateListingScreen = () => {
               Lat: {form.location.latitude.toFixed(4)}, Long: {form.location.longitude.toFixed(4)}
             </Text>
           </View>
-          <Modal>
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: location ? location.latitude : 0,
-                longitude: location ? location.longitude : 0,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
+
+          <Modal
+            animationType="slide"
+            visible={isModalOpen}
+            style={{
+              alignContent: "center",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "pink",
+            }}
+            onRequestClose={() => {
+              setIsModalOpen(!isModalOpen);
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              onPress={(e) =>
-                setLocation({
-                  ...e.nativeEvent.coordinate,
-                  altitude: 0,
-                  accuracy: 0,
-                  altitudeAccuracy: 0,
-                  heading: 0,
-                  speed: 0,
-                })
-              }
             >
-              {location && (
-                <Marker
-                  coordinate={location}
-                  draggable
-                  onDragEnd={(e) =>
-                    setLocation({
-                      ...e.nativeEvent.coordinate,
-                      altitude: 0,
-                      accuracy: 0,
-                      altitudeAccuracy: 0,
-                      heading: 0,
-                      speed: 0,
-                    })
-                  }
-                />
-              )}
-            </MapView>
+              <TouchableOpacity
+                style={{ margin: 30, justifyContent: "center", alignSelf: "flex-start" }}
+                onPress={() => setIsModalOpen(false)}
+              >
+                <Text style={{ ...styles.mapButtonText }}>Cancel</Text>
+              </TouchableOpacity>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: location ? location.latitude : 0,
+                  longitude: location ? location.longitude : 0,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                provider={PROVIDER_GOOGLE}
+                onPress={(e) =>
+                  setLocation({
+                    ...e.nativeEvent.coordinate,
+                    altitude: 0,
+                    accuracy: 0,
+                    altitudeAccuracy: 0,
+                    heading: 0,
+                    speed: 0,
+                  })
+                }
+              >
+                {location && (
+                  <Marker
+                    coordinate={location}
+                    draggable
+                    onDragEnd={(e) =>
+                      setLocation({
+                        ...e.nativeEvent.coordinate,
+                        altitude: 0,
+                        accuracy: 0,
+                        altitudeAccuracy: 0,
+                        heading: 0,
+                        speed: 0,
+                      })
+                    }
+                  />
+                )}
+              </MapView>
+              <TouchableOpacity
+                style={{ ...styles.mapButton, margin: 30, justifyContent: "center" }}
+                onPress={() => setIsModalOpen(false)}
+              >
+                <Text style={styles.mapButtonText}>Set Location</Text>
+              </TouchableOpacity>
+            </View>
           </Modal>
+
           {/* Features */}
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldGroupTitle}>Features</Text>
@@ -934,7 +992,7 @@ const styles = StyleSheet.create({
   },
   map: {
     width: "100%",
-    height: 400,
+    height: 500,
   },
   featureInput: {
     flexDirection: "row",
