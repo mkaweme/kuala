@@ -21,7 +21,7 @@ import {
 
 // Image mapping utility function
 const getImageSource = (imageId: string) => {
-  const imageMap: { [key: string]: any } = {
+  const imageMap: { [key: string]: number } = {
     "1": require("@/assets/images/1.jpg"),
     "2": require("@/assets/images/2.jpg"),
     "3": require("@/assets/images/3.jpg"),
@@ -138,7 +138,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         if (isOfficeProperty(property)) {
           return (
             <Text style={styles.bedroomsText}>
-              {property.squareFootage} sq ft Office
+              {property.squareMeters} sq ft Office
               {property.floorNumber && ` • Floor ${property.floorNumber}`}
             </Text>
           );
@@ -149,7 +149,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         if (isPlotProperty(property)) {
           return (
             <Text style={styles.bedroomsText}>
-              {property.squareFootage} sq ft Plot
+              {property.squareMeters} sq ft Plot
               {property.zoning && ` • ${property.zoning} Zoning`}
             </Text>
           );

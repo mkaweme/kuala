@@ -2,8 +2,8 @@ import { supabase } from "@/assets/supabase_client";
 import { Property } from "@/types/property";
 
 export interface WatchlistItem {
-  id: number;
-  client_id: string;
+  id: string;
+  user_id: string;
   property_id: string;
   created_at: string;
   property?: Property;
@@ -25,9 +25,9 @@ export class WatchlistService {
 
       // Check if already in watchlist
       const { data: existing } = await supabase
-        .from("favorites")
+        .from("favourites")
         .select("id")
-        .eq("client_id", user.id)
+        .eq("user_id", user.id)
         .eq("property_id", propertyId)
         .single();
 
@@ -35,8 +35,8 @@ export class WatchlistService {
         return { success: false, error: "Property already in watchlist" };
       }
 
-      const { error } = await supabase.from("favorites").insert({
-        client_id: user.id,
+      const { error } = await supabase.from("favourites").insert({
+        user_id: user.id,
         property_id: propertyId,
       });
 
@@ -68,9 +68,9 @@ export class WatchlistService {
       }
 
       const { error } = await supabase
-        .from("favorites")
+        .from("favourites")
         .delete()
-        .eq("client_id", user.id)
+        .eq("user_id", user.id)
         .eq("property_id", propertyId);
 
       if (error) {
@@ -99,11 +99,11 @@ export class WatchlistService {
       }
 
       const { data, error } = await supabase
-        .from("favorites")
+        .from("favourites")
         .select(
           `
           id,
-          client_id,
+          user_id,
           property_id,
           created_at,
           properties (
@@ -124,7 +124,7 @@ export class WatchlistService {
           )
         `,
         )
-        .eq("client_id", user.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -153,14 +153,14 @@ export class WatchlistService {
       }
 
       const { data, error } = await supabase
-        .from("favorites")
+        .from("favourites")
         .select("id")
-        .eq("client_id", user.id)
+        .eq("user_id", user.id)
         .eq("property_id", propertyId)
         .single();
 
       if (error && error.code !== "PGRST116") {
-        // PGRST116 is "not found" error
+        // PGRST116 = "not found"
         console.error("Error checking watchlist status:", error);
         return { isWatched: false, error: error.message };
       }
@@ -186,9 +186,9 @@ export class WatchlistService {
       }
 
       const { count, error } = await supabase
-        .from("favorites")
+        .from("favourites")
         .select("*", { count: "exact", head: true })
-        .eq("client_id", user.id);
+        .eq("user_id", user.id);
 
       if (error) {
         console.error("Error fetching watchlist count:", error);
