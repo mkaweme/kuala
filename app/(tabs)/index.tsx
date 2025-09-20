@@ -3,22 +3,22 @@ import PropertyCard from "@/components/PropertyCard";
 import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
-import { HouseProperty, WarehouseProperty } from "@/types";
+import { HouseProperty, ListingType, PropertyType, WarehouseProperty } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
 export const HOUSES: HouseProperty[] = [
   {
-    id: "1",
+    id: "e45a2b1c-bfc9-4bfa-90f4-1d87f89c7a47",
     title: "Modern 1 Bedroom House",
     noOfBedrooms: 1,
     area: "Woodlands",
     town: "Lusaka",
-    listing: "rent",
+    listing: ListingType.RENT,
     price: 200000,
     rate: "pm",
-    type: "house",
+    type: PropertyType.HOUSE,
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -64,15 +64,15 @@ export const HOUSES: HouseProperty[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: "2",
+    id: "38a5fce3-1c07-4baf-b77c-774fda1e5d58",
     noOfBedrooms: 3,
     area: "Ibex Hill",
     title: "Spacious 3 Bedroomed House",
     town: "Lusaka",
-    listing: "rent",
+    listing: ListingType.RENT,
     price: 500000,
     rate: "pm",
-    type: "house",
+    type: PropertyType.HOUSE,
     features: ["Tiles", "Built-In Kitchen Units", "Built-In Wardrobes", "Paved Yard"],
     photos: [
       {
@@ -112,14 +112,14 @@ export const HOUSES: HouseProperty[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: "3",
+    id: "71f2e27a-03a2-4491-9b39-8a882dcf2f59",
     noOfBedrooms: 3,
     area: "Meanwood Chamba Valley",
     title: "Modern 4 bedroomed House",
     town: "Lusaka",
-    listing: "sale",
+    listing: ListingType.SALE,
     price: 90000000,
-    type: "house",
+    type: PropertyType.HOUSE,
     features: [
       "Tiles",
       "Built-In Kitchen Units",
@@ -180,14 +180,14 @@ export const HOUSES: HouseProperty[] = [
 
 const WAREHOUSES: WarehouseProperty[] = [
   {
-    id: "4",
+    id: "dfc68b83-9d62-41ac-9fd1-6d14b1a908c7",
     title: "Large Warehouse",
     area: "Chinika",
     town: "Lusaka",
     price: 12000000,
     rate: "yr",
-    listing: "lease",
-    type: "warehouse",
+    listing: ListingType.LEASE,
+    type: PropertyType.WAREHOUSE,
     features: ["Road Frontage", "Overhead Crane"],
     photos: [
       {

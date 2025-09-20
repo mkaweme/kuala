@@ -3,8 +3,22 @@ export interface Photo {
   src: string[];
 }
 
-export type PropertyType = "house" | "office" | "plot" | "farm" | "warehouse";
-export type ListingType = "rent" | "sale" | "lease";
+// export type PropertyType = "house" | "office" | "plot" | "farm" | "warehouse";
+// export type ListingType = "rent" | "sale" | "lease";
+
+export enum PropertyType {
+  HOUSE = "house",
+  OFFICE = "office",
+  PLOT = "plot",
+  FARM = "farm",
+  WAREHOUSE = "warehouse",
+}
+
+export enum ListingType {
+  RENT = "rent",
+  SALE = "sale",
+  LEASE = "lease",
+}
 
 // Base property interface with common fields
 export interface BaseProperty {
@@ -25,18 +39,18 @@ export interface BaseProperty {
 
 // House-specific properties
 export interface HouseProperty extends BaseProperty {
-  type: "house";
+  type: PropertyType.HOUSE;
   noOfBedrooms: number;
   noOfBathrooms?: number;
-  squareFootage?: number;
+  squareMeters?: number;
   hasGarden?: boolean;
   hasParking?: boolean;
 }
 
 // Office-specific properties
 export interface OfficeProperty extends BaseProperty {
-  type: "office";
-  squareFootage: number;
+  type: PropertyType.OFFICE;
+  squareMeters: number;
   floorNumber?: number;
   hasReception?: boolean;
   hasMeetingRooms?: number;
@@ -45,8 +59,8 @@ export interface OfficeProperty extends BaseProperty {
 
 // Plot-specific properties
 export interface PlotProperty extends BaseProperty {
-  type: "plot";
-  squareFootage: number;
+  type: PropertyType.PLOT;
+  squareMeters: number;
   zoning?: string;
   hasUtilities?: boolean;
   roadAccess?: boolean;
@@ -55,7 +69,7 @@ export interface PlotProperty extends BaseProperty {
 
 // Farm-specific properties
 export interface FarmProperty extends BaseProperty {
-  type: "farm";
+  type: PropertyType.FARM;
   acreage: number;
   hasWater?: boolean;
   soilType?: string;
@@ -65,7 +79,7 @@ export interface FarmProperty extends BaseProperty {
 
 // Warehouse-specific properties
 export interface WarehouseProperty extends BaseProperty {
-  type: "warehouse";
+  type: PropertyType.WAREHOUSE;
   squareMeters: number;
   ceilingHeight: number;
   loadingDock: boolean;
@@ -97,16 +111,16 @@ export interface PropertyFilters {
 
 // Helper type guards
 export const isHouseProperty = (property: Property): property is HouseProperty =>
-  property.type === "house";
+  property.type === PropertyType.HOUSE;
 
 export const isOfficeProperty = (property: Property): property is OfficeProperty =>
-  property.type === "office";
+  property.type === PropertyType.OFFICE;
 
 export const isPlotProperty = (property: Property): property is PlotProperty =>
-  property.type === "plot";
+  property.type === PropertyType.PLOT;
 
 export const isFarmProperty = (property: Property): property is FarmProperty =>
-  property.type === "farm";
+  property.type === PropertyType.FARM;
 
 export const isWarehouseProperty = (property: Property): property is WarehouseProperty =>
-  property.type === "warehouse";
+  property.type === PropertyType.WAREHOUSE;
