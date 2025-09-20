@@ -15,8 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, {PROVIDER_GOOGLE, Marker } from "react-native-maps";
-// import Constants from "expo-constants";
+import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from "react-native-maps";
 
 interface PhotoWithCaption {
   uri: string;
@@ -71,12 +70,12 @@ const CreateListingScreen = () => {
   // const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [form, setForm] = useState<CreateListingForm>({
-    propertyType: "house",
+    propertyType: PropertyType.HOUSE,
     title: "",
     description: "",
     price: "",
     rate: "",
-    listing: "rent",
+    listing: ListingType.RENT,
     area: "",
     town: "",
     features: [],
@@ -89,18 +88,6 @@ const CreateListingScreen = () => {
   const [currentFeature, setCurrentFeature] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // const getLocationPersmission = async () => {
-  //   const { status } = await Location.requestForegroundPermissionsAsync();
-  //   console.log("Permission status", status);
-  //   if (status !== "granted") {
-  //     alert("Permission to access location was denied");
-  //     return;
-  //   }
-  //   const userLocation = await Location.getCurrentPositionAsync({});
-  //   setLocation(userLocation.coords);
-  //   setIsModalOpen(false);
-  // };
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -117,39 +104,18 @@ const CreateListingScreen = () => {
     getCurrentLocation();
   }, []);
 
-  //Define a function that fetches the delivery route and calculates the distance
-  // const fetchRoute = async () => {
-  //   if (!location) return;
-  //   try {
-  //     const origin = `${-15.3339709},${28.3523437}`;
-  //     const destination = `${location.latitude},${location.longitude}`;
-  //     const apiKey = Constants.expoConfig?.extra?.googleMapsApiKey;
-  //     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=
-  //     ${origin}&destination=${destination}&key=${apiKey}`;
-
-  //     const response = await fetch(url);
-  //     const data = await response.json();
-
-  //     if (data.routes.length) {
-  //       console.log("Data :", data);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching route:", error);
-  //   }
-  // };
-
   const propertyTypes: { value: PropertyType; label: string; icon: string }[] = [
-    { value: "house", label: "House", icon: "home-outline" },
-    { value: "office", label: "Office", icon: "business-outline" },
-    { value: "plot", label: "Plot", icon: "map-outline" },
-    { value: "farm", label: "Farm", icon: "leaf-outline" },
-    { value: "warehouse", label: "Warehouse", icon: "cube-outline" },
+    { value: PropertyType.HOUSE, label: "House", icon: "home-outline" },
+    { value: PropertyType.OFFICE, label: "Office", icon: "business-outline" },
+    { value: PropertyType.PLOT, label: "Plot", icon: "map-outline" },
+    { value: PropertyType.FARM, label: "Farm", icon: "leaf-outline" },
+    { value: PropertyType.WAREHOUSE, label: "Warehouse", icon: "cube-outline" },
   ];
 
   const listingTypes: { value: ListingType; label: string }[] = [
-    { value: "rent", label: "Rent" },
-    { value: "sale", label: "Sale" },
-    { value: "lease", label: "Lease" },
+    { value: ListingType.RENT, label: "Rent" },
+    { value: ListingType.SALE, label: "Sale" },
+    { value: ListingType.LEASE, label: "Lease" },
   ];
 
   const rateTypes = [
@@ -530,12 +496,12 @@ const CreateListingScreen = () => {
 
       // Reset form
       setForm({
-        propertyType: "house",
+        propertyType: PropertyType.HOUSE,
         title: "",
         description: "",
         price: "",
         rate: "",
-        listing: "rent",
+        listing: ListingType.RENT,
         area: "",
         town: "",
         features: [],
@@ -724,7 +690,9 @@ const CreateListingScreen = () => {
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.01,
                 }}
-                provider={PROVIDER_GOOGLE}
+                provider={Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+                showsUserLocation
+                showsMyLocationButton
                 onPress={(e) =>
                   setLocation({
                     ...e.nativeEvent.coordinate,
