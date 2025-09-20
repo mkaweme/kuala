@@ -13,6 +13,44 @@ import {
 } from "react-native";
 import BookingModal from "./BookingModal";
 
+// Image mapping utility function
+const getImageSource = (imageId: string) => {
+  const imageMap: { [key: string]: number } = {
+    "1": require("@/assets/images/1.jpg"),
+    "2": require("@/assets/images/2.jpg"),
+    "3": require("@/assets/images/3.jpg"),
+    "4": require("@/assets/images/4.jpg"),
+    "5": require("@/assets/images/5.jpg"),
+    "6": require("@/assets/images/6.jpg"),
+    "7": require("@/assets/images/7.jpg"),
+    "8": require("@/assets/images/8.jpg"),
+    "9": require("@/assets/images/9.jpg"),
+    "10": require("@/assets/images/10.jpg"),
+    "11": require("@/assets/images/11.jpg"),
+    "12": require("@/assets/images/12.jpg"),
+    "13": require("@/assets/images/13.jpg"),
+    "14": require("@/assets/images/14.jpg"),
+    "15": require("@/assets/images/15.jpg"),
+    "16": require("@/assets/images/16.jpg"),
+    "17": require("@/assets/images/17.jpg"),
+    "18": require("@/assets/images/18.jpg"),
+    "19": require("@/assets/images/19.jpg"),
+    "20": require("@/assets/images/20.jpg"),
+    "21": require("@/assets/images/21.jpg"),
+    "22": require("@/assets/images/22.jpg"),
+    "23": require("@/assets/images/23.jpg"),
+    "24": require("@/assets/images/24.jpg"),
+    "25": require("@/assets/images/25.jpg"),
+    "26": require("@/assets/images/26.jpg"),
+    "27": require("@/assets/images/27.jpg"),
+    "28": require("@/assets/images/28.jpg"),
+    "29": require("@/assets/images/29.jpg"),
+    "30": require("@/assets/images/30.jpg"),
+  };
+
+  return imageMap[imageId] || require("@/assets/images/1.jpg");
+};
+
 interface PropertyDetailsModalProps {
   visible: boolean;
   property: Property | null;
@@ -29,10 +67,9 @@ const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
   const [bookingModalVisible, setBookingModalVisible] = useState(false);
 
   const imageSources = useMemo(() => {
-    if (!property) return [] as any[];
-    const flat = property.photos.flatMap((p: any) => p.src);
-    // Only keep non-string entries to avoid dynamic require issues
-    return flat.filter((s: any) => typeof s !== "string");
+    if (!property) return [] as string[];
+    const flat = property.photos.flatMap((p) => p.src);
+    return flat.filter((s) => typeof s === "string");
   }, [property]);
 
   if (!property) return null;
@@ -67,7 +104,7 @@ const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
               {imageSources.map((src, idx) => (
                 <Image
                   key={idx}
-                  source={src as any}
+                  source={getImageSource(src)}
                   style={styles.carouselImage}
                   resizeMode="cover"
                 />
