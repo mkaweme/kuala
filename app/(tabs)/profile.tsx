@@ -3,7 +3,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { ProfileService } from "@/services/profileService";
 import { ProfileType, UserProfile } from "@/types/auth";
-import { Ionicons } from "@expo/vector-icons";
+import { PropertyType } from "@/types/property";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -51,7 +53,6 @@ const ProfileScreen = () => {
     setIsLoading(true);
     try {
       const userProfile = await ProfileService.getProfile(user.id);
-      console.log("User Profile:", userProfile);
       if (userProfile) {
         setProfile(userProfile);
         setProfileType(userProfile.profileType);
@@ -109,7 +110,19 @@ const ProfileScreen = () => {
   const handleSignOut = async () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Sign Out", style: "destructive", onPress: signOut },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await signOut();
+            router.replace("/login");
+          } catch (error) {
+            console.error("Sign out failed:", error);
+            Alert.alert("Error", "Failed to sign out. Please try again.");
+          }
+        },
+      },
     ]);
   };
 
@@ -337,6 +350,80 @@ const ProfileScreen = () => {
     }
   };
 
+  const renderPropertyTypeSelector = () => {
+    const isSelectorVisible = ["tenant", "buyer", "seller", "landlord"].includes(profileType);
+    if (!isSelectorVisible) return null;
+
+    const selectedTypes = profile.preferences?.propertyType || [];
+    const allTypes = [
+      PropertyType.HOUSE,
+      PropertyType.OFFICE,
+      PropertyType.PLOT,
+      PropertyType.FARM,
+      PropertyType.WAREHOUSE,
+    ];
+
+    const toggleType = (type: PropertyType) => {
+      const next = selectedTypes.includes(type)
+        ? selectedTypes.filter((t) => t !== type)
+        : [...selectedTypes, type];
+      setProfile({
+        ...profile,
+        preferences: {
+          ...profile.preferences,
+          propertyType: next,
+        },
+      });
+    };
+
+    return (
+      <View style={[styles.section, { backgroundColor: colors.card }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferred Property Types</Text>
+        <View style={styles.profileTypeButtons}>
+          {allTypes.map((type) => {
+            const isActive = selectedTypes.includes(type);
+            return (
+              <TouchableOpacity
+                key={type}
+                style={[
+                  styles.profileTypeButton,
+                  { borderColor: colors.border, backgroundColor: colors.surface },
+                  isActive && { backgroundColor: colors.primary, borderColor: colors.primary },
+                ]}
+                onPress={() => toggleType(type)}
+              >
+                <MaterialCommunityIcons
+                  name={
+                    (
+                      {
+                        [PropertyType.HOUSE]: "home-variant-outline",
+                        [PropertyType.OFFICE]: "office-building",
+                        [PropertyType.PLOT]: "map-outline",
+                        [PropertyType.FARM]: "barn",
+                        [PropertyType.WAREHOUSE]: "warehouse",
+                      } as const
+                    )[type] as keyof typeof MaterialCommunityIcons.glyphMap
+                  }
+                  size={22}
+                  color={isActive ? colors.buttonText : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.profileTypeText,
+                    { color: colors.textSecondary },
+                    isActive && { color: colors.buttonText },
+                  ]}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
   if (isLoading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
@@ -389,51 +476,6 @@ const ProfileScreen = () => {
               <Ionicons name={isEditing ? "checkmark" : "pencil"} size={24} color="#4CAF50" />
             )}
           </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Profile Type Selector */}
-      <View style={[styles.profileTypeContainer, { backgroundColor: colors.card }]}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile Type</Text>
-        <View style={styles.profileTypeButtons}>
-          {[
-            { type: "tenant" as ProfileType, label: "Tenant", icon: "home-outline" },
-            { type: "buyer" as ProfileType, label: "Buyer", icon: "home-outline" },
-            { type: "seller" as ProfileType, label: "seller", icon: "home-outline" },
-            { type: "landlord" as ProfileType, label: "Landlord", icon: "business-outline" },
-            { type: "agent" as ProfileType, label: "Agent", icon: "person-outline" },
-          ].map(({ type, label, icon }) => (
-            <TouchableOpacity
-              key={type}
-              style={[
-                styles.profileTypeButton,
-                { borderColor: colors.border, backgroundColor: colors.surface },
-                profileType === type && {
-                  backgroundColor: colors.primary,
-                  borderColor: colors.primary,
-                },
-              ]}
-              onPress={() => {
-                setProfileType(type);
-                setProfile({ ...profile, profileType: type });
-              }}
-            >
-              <Ionicons
-                name={icon as keyof typeof Ionicons.glyphMap}
-                size={24}
-                color={profileType === type ? colors.buttonText : colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.profileTypeText,
-                  { color: colors.textSecondary },
-                  profileType === type && { color: colors.buttonText },
-                ]}
-              >
-                {label}
-              </Text>
-            </TouchableOpacity>
-          ))}
         </View>
       </View>
 
@@ -555,6 +597,54 @@ const ProfileScreen = () => {
           />
         </View>
       </View>
+
+      {/* Profile Type Selector */}
+      <View style={[styles.profileTypeContainer, { backgroundColor: colors.card }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile Type</Text>
+        <View style={styles.profileTypeButtons}>
+          {[
+            { type: "tenant" as ProfileType, label: "Tenant", icon: "home-outline" },
+            { type: "buyer" as ProfileType, label: "Buyer", icon: "home-outline" },
+            { type: "seller" as ProfileType, label: "seller", icon: "home-outline" },
+            { type: "landlord" as ProfileType, label: "Landlord", icon: "business-outline" },
+            { type: "agent" as ProfileType, label: "Agent", icon: "person-outline" },
+          ].map(({ type, label, icon }) => (
+            <TouchableOpacity
+              key={type}
+              style={[
+                styles.profileTypeButton,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+                profileType === type && {
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => {
+                setProfileType(type);
+                setProfile({ ...profile, profileType: type });
+              }}
+            >
+              <Ionicons
+                name={icon as keyof typeof Ionicons.glyphMap}
+                size={24}
+                color={profileType === type ? colors.buttonText : colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.profileTypeText,
+                  { color: colors.textSecondary },
+                  profileType === type && { color: colors.buttonText },
+                ]}
+              >
+                {label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Preferred Property Types (for tenant/buyer/seller/landlord) */}
+      {renderPropertyTypeSelector()}
 
       {/* Profile Type Specific Information */}
       {renderProfileSpecificInfo()}
@@ -710,7 +800,6 @@ const styles = StyleSheet.create({
   profileTypeContainer: {
     backgroundColor: "#fff",
     margin: 20,
-    marginTop: -20,
     borderRadius: 12,
     padding: 20,
     shadowColor: "#000",
@@ -755,7 +844,6 @@ const styles = StyleSheet.create({
   section: {
     backgroundColor: "#fff",
     margin: 20,
-    marginTop: 0,
     borderRadius: 12,
     padding: 20,
     shadowColor: "#000",
