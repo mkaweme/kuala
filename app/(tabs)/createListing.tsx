@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 interface PhotoWithCaption {
   uri: string;
@@ -112,19 +112,19 @@ const CreateListingScreen = () => {
     { value: PropertyType.WAREHOUSE, label: "Warehouse", icon: "cube-outline" },
   ];
 
-  const listingTypes: { value: ListingType; label: string }[] = [
-    { value: ListingType.RENT, label: "Rent" },
-    { value: ListingType.SALE, label: "Sale" },
-    { value: ListingType.LEASE, label: "Lease" },
-  ];
+  // const listingTypes: { value: ListingType; label: string }[] = [
+  //   { value: ListingType.RENT, label: "Rent" },
+  //   { value: ListingType.SALE, label: "Sale" },
+  //   { value: ListingType.LEASE, label: "Lease" },
+  // ];
 
-  const rateTypes = [
-    { value: "pyr", label: "Per Year" },
-    { value: "pm", label: "Per Month" },
-    { value: "pw", label: "Per Week" },
-    { value: "pd", label: "Per Day" },
-    { value: "", label: "One Time" },
-  ];
+  // const rateTypes = [
+  //   { value: "pyr", label: "Per Year" },
+  //   { value: "pm", label: "Per Month" },
+  //   { value: "pw", label: "Per Week" },
+  //   { value: "pd", label: "Per Day" },
+  //   { value: "", label: "One Time" },
+  // ];
 
   const handlePhotoUpload = async () => {
     Alert.alert(
@@ -180,12 +180,12 @@ const CreateListingScreen = () => {
     }));
   };
 
-  const updateLocation = (latitude: number, longitude: number) => {
-    setForm((prev) => ({
-      ...prev,
-      location: { latitude, longitude },
-    }));
-  };
+  // const updateLocation = (latitude: number, longitude: number) => {
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     location: { latitude, longitude },
+  //   }));
+  // };
 
   const renderPropertyTypeFields = () => {
     switch (form.propertyType) {
@@ -690,19 +690,21 @@ const CreateListingScreen = () => {
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.01,
                 }}
-                provider={Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+                provider={PROVIDER_GOOGLE}
                 showsUserLocation
-                showsMyLocationButton
-                onPress={(e) =>
-                  setLocation({
-                    ...e.nativeEvent.coordinate,
-                    altitude: 0,
-                    accuracy: 0,
-                    altitudeAccuracy: 0,
-                    heading: 0,
-                    speed: 0,
-                  })
-                }
+                showsCompass
+                // loadingEnabled
+                // showsMyLocationButton
+                // onPress={(e) =>
+                //   setLocation({
+                //     ...e.nativeEvent.coordinate,
+                //     altitude: 0,
+                //     accuracy: 0,
+                //     altitudeAccuracy: 0,
+                //     heading: 0,
+                //     speed: 0,
+                //   })
+                // }
               >
                 {location && (
                   <Marker
