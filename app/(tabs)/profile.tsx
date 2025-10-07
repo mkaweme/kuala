@@ -73,7 +73,6 @@ const ProfileScreen = () => {
   };
 
   const saveProfile = async () => {
-    console.log("User", user?.id);
     if (!user?.id) return;
 
     setIsSaving(true);
@@ -131,9 +130,69 @@ const ProfileScreen = () => {
       <Text style={{ ...styles.sectionTitle, color: colors.text }}>Property Preferences</Text>
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Min Budget</Text>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>City</Text>
           <TextInput
-            style={{ ...styles.input, backgroundColor: colors.card }}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+              },
+            ]}
+            value={profile.preferences?.city || ""}
+            onChangeText={(text) =>
+              setProfile({
+                ...profile,
+                preferences: {
+                  ...profile.preferences,
+                  city: text,
+                },
+              })
+            }
+            placeholder="City"
+            placeholderTextColor={colors.inputPlaceholder}
+            editable={isEditing}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+            Area/Neighbourhood
+          </Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+              },
+            ]}
+            value={profile.preferences?.area || ""}
+            onChangeText={(text) =>
+              setProfile({
+                ...profile,
+                preferences: {
+                  ...profile.preferences,
+                  area: text,
+                },
+              })
+            }
+            placeholder="Area or Neighbourhood"
+            placeholderTextColor={colors.inputPlaceholder}
+            editable={isEditing}
+          />
+        </View>
+      </View>
+      <View style={styles.inputRow}>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Min Budget</Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+              },
+            ]}
             value={profile.preferences?.budget?.min?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -153,9 +212,9 @@ const ProfileScreen = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Max Budget</Text>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Max Budget</Text>
           <TextInput
-            style={{ ...styles.input, backgroundColor: colors.card }}
+            style={{ ...styles.input, backgroundColor: colors.card, color: colors.text }}
             value={profile.preferences?.budget?.max?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -177,9 +236,9 @@ const ProfileScreen = () => {
       </View>
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Min Bedrooms</Text>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Min Bedrooms</Text>
           <TextInput
-            style={{ ...styles.input, backgroundColor: colors.card }}
+            style={{ ...styles.input, backgroundColor: colors.card, color: colors.text }}
             value={profile.preferences?.bedrooms?.min?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -199,9 +258,9 @@ const ProfileScreen = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Max Bedrooms</Text>
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Max Bedrooms</Text>
           <TextInput
-            style={{ ...styles.input, backgroundColor: colors.card }}
+            style={{ ...styles.input, backgroundColor: colors.card, color: colors.text }}
             value={profile.preferences?.bedrooms?.max?.toString() || ""}
             onChangeText={(text) =>
               setProfile({
@@ -225,22 +284,38 @@ const ProfileScreen = () => {
   );
 
   const renderLandlordInfo = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Property Information</Text>
+    <View style={[styles.section, { backgroundColor: colors.card }]}>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Property Information</Text>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Number of Properties</Text>
+        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+          Number of Properties
+        </Text>
         <TextInput
-          style={styles.input}
-          value={profile.preferences?.properties?.length?.toString() || "0"}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+              color: colors.text,
+            },
+          ]}
+          value={profile.preferences?.properties?.length?.toString()}
           placeholder="Number of properties you own"
           keyboardType="numeric"
           editable={isEditing}
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Property Types</Text>
+        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Property Types</Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+              color: colors.text,
+            },
+          ]}
           value={profile.preferences?.propertyType?.join(", ") || ""}
           onChangeText={(text) =>
             setProfile({
@@ -259,12 +334,19 @@ const ProfileScreen = () => {
   );
 
   const renderAgentInfo = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Professional Information</Text>
+    <View style={[styles.section, { backgroundColor: colors.card }]}>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Information</Text>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>License Number</Text>
+        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>License Number</Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+              color: colors.text,
+            },
+          ]}
           value={profile.preferences?.licenseNumber || ""}
           onChangeText={(text) =>
             setProfile({
@@ -280,9 +362,16 @@ const ProfileScreen = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Agency</Text>
+        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Agency</Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+              color: colors.text,
+            },
+          ]}
           value={profile.preferences?.agency || ""}
           onChangeText={(text) =>
             setProfile({
@@ -298,9 +387,18 @@ const ProfileScreen = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Years of Experience</Text>
+        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+          Years of Experience
+        </Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+              color: colors.text,
+            },
+          ]}
           value={profile.preferences?.experience?.toString() || ""}
           onChangeText={(text) =>
             setProfile({
@@ -317,9 +415,16 @@ const ProfileScreen = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Specializations</Text>
+        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Specializations</Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+              color: colors.text,
+            },
+          ]}
           value={profile.preferences?.specializations?.join(", ") || ""}
           onChangeText={(text) =>
             setProfile({
@@ -341,6 +446,10 @@ const ProfileScreen = () => {
     switch (profileType) {
       case "tenant":
         return renderTenantPreferences();
+      case "buyer":
+        return renderTenantPreferences();
+      case "seller":
+        return renderLandlordInfo();
       case "landlord":
         return renderLandlordInfo();
       case "agent":
@@ -445,8 +554,13 @@ const ProfileScreen = () => {
             {profile.avatar ? (
               <Image source={{ uri: profile.avatar }} style={styles.avatar} />
             ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person" size={40} color="#fff" />
+              <View
+                style={[
+                  styles.avatarPlaceholder,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons name="person" size={40} color={colors.text} />
               </View>
             )}
           </View>
@@ -605,7 +719,7 @@ const ProfileScreen = () => {
           {[
             { type: "tenant" as ProfileType, label: "Tenant", icon: "home-outline" },
             { type: "buyer" as ProfileType, label: "Buyer", icon: "home-outline" },
-            { type: "seller" as ProfileType, label: "seller", icon: "home-outline" },
+            { type: "seller" as ProfileType, label: "Seller", icon: "home-outline" },
             { type: "landlord" as ProfileType, label: "Landlord", icon: "business-outline" },
             { type: "agent" as ProfileType, label: "Agent", icon: "person-outline" },
           ].map(({ type, label, icon }) => (
@@ -767,9 +881,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 2,
   },
   headerInfo: {
     flex: 1,
