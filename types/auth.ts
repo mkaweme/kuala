@@ -29,6 +29,8 @@ export interface UserPreferences {
     max?: number;
   };
   location?: string[];
+  city?: string;
+  area?: string;
 
   // Landlord/Seller preferences
   properties?: string[];
