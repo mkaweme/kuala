@@ -1,7 +1,9 @@
+import { supabase } from "@/assets/supabase_client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -14,6 +16,26 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { colors } = useColorScheme();
+  const [showCreateListing, setShowCreateListing] = useState<boolean>(false);
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!user?.id) return;
+
+      const { data, error } = await supabase.from("profiles").select("role").eq("id", user.id);
+      if (error) {
+        console.error("Error fetching role:", error);
+        return;
+      }
+      setShowCreateListing(
+        data[0].role === "landlord" || data[0].role === "seller" || data[0].role === "agent",
+      );
+    };
+
+    fetchUserRole();
+  }, [user?.id]);
 
   return (
     <Tabs
@@ -64,6 +86,7 @@ export default function TabLayout() {
         options={{
           title: "Create",
           tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,
+          href: showCreateListing ? undefined : null, // hide if not allowed
         }}
       />
       <Tabs.Screen
