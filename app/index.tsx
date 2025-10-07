@@ -1,17 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
-import {
-  ActivityIndicator,
-  // Dimensions,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, ImageBackground, StyleSheet, Text, View } from "react-native";
 import { useAppInitialization } from "../hooks/useAppInitialization";
-
-// const { width, height } = Dimensions.get("window");
 
 export default function LandingPage() {
   const { isLoading, isAuthenticated, error } = useAppInitialization();
