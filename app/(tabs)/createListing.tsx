@@ -1,7 +1,8 @@
 import { ListingType, PropertyType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import React, { useEffect, useState } from "react";
+import React, { ComponentProps, useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -16,13 +17,14 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { PropertyService } from "@/services/propertyService";
 
 interface PhotoWithCaption {
   uri: string;
   caption: string;
 }
 
-interface CreateListingForm {
+export interface CreateListingForm {
   propertyType: PropertyType;
   title: string;
   description: string;
@@ -40,7 +42,7 @@ interface CreateListingForm {
   // House-specific fields
   noOfBedrooms?: string;
   noOfBathrooms?: string;
-  squareFootage?: string;
+  squareMeters?: string;
   hasGarden?: boolean;
   hasParking?: boolean;
   // Office-specific fields
@@ -88,6 +90,7 @@ const CreateListingScreen = () => {
   const [currentFeature, setCurrentFeature] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isListingDropdownOpen, setIsListingDropdownOpen] = useState(false);
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -104,7 +107,9 @@ const CreateListingScreen = () => {
     getCurrentLocation();
   }, []);
 
-  const propertyTypes: { value: PropertyType; label: string; icon: string }[] = [
+  type IoniconName = ComponentProps<typeof Ionicons>["name"];
+
+  const propertyTypes: { value: PropertyType; label: string; icon: IoniconName }[] = [
     { value: PropertyType.HOUSE, label: "House", icon: "home-outline" },
     { value: PropertyType.OFFICE, label: "Office", icon: "business-outline" },
     { value: PropertyType.PLOT, label: "Plot", icon: "map-outline" },
@@ -112,11 +117,14 @@ const CreateListingScreen = () => {
     { value: PropertyType.WAREHOUSE, label: "Warehouse", icon: "cube-outline" },
   ];
 
-  // const listingTypes: { value: ListingType; label: string }[] = [
-  //   { value: ListingType.RENT, label: "Rent" },
-  //   { value: ListingType.SALE, label: "Sale" },
-  //   { value: ListingType.LEASE, label: "Lease" },
-  // ];
+  const listingTypes: { value: ListingType; label: string }[] = [
+    { value: ListingType.RENT, label: "Rent" },
+    { value: ListingType.SALE, label: "Sale" },
+    { value: ListingType.LEASE, label: "Lease" },
+  ];
+
+  const selectedListingLabel =
+    listingTypes.find((type) => type.value === form.listing)?.label ?? "Select listing type";
 
   // const rateTypes = [
   //   { value: "pyr", label: "Per Year" },
@@ -127,26 +135,25 @@ const CreateListingScreen = () => {
   // ];
 
   const handlePhotoUpload = async () => {
-    Alert.alert(
-      "Photo Upload",
-      "Photo upload functionality will be available after installing expo-image-picker. For now, you can add a placeholder photo URL.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Add Placeholder",
-          onPress: () => {
-            const newPhoto: PhotoWithCaption = {
-              uri: "https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Property+Photo",
-              caption: "Sample Photo",
-            };
-            setForm((prev) => ({
-              ...prev,
-              photos: [...prev.photos, newPhoto],
-            }));
-          },
-        },
-      ],
-    );
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsMultipleSelection: true,
+      selectionLimit: 0,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets?.length) {
+      setForm((prev) => ({
+        ...prev,
+        photos: [
+          ...prev.photos,
+          ...result.assets.map((asset) => ({
+            uri: asset.uri,
+            caption: "",
+          })),
+        ],
+      }));
+    }
   };
 
   const removePhoto = (index: number) => {
@@ -217,11 +224,11 @@ const CreateListingScreen = () => {
             </View>
             <View style={styles.row}>
               <View style={styles.halfField}>
-                <Text style={styles.label}>Square Footage</Text>
+                <Text style={styles.label}>Square Meters</Text>
                 <TextInput
                   style={styles.input}
-                  value={form.squareFootage}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
+                  value={form.squareMeters}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareMeters: text }))}
                   placeholder="1500"
                   keyboardType="numeric"
                 />
@@ -257,8 +264,8 @@ const CreateListingScreen = () => {
                 <Text style={styles.label}>Square Meters</Text>
                 <TextInput
                   style={styles.input}
-                  value={form.squareFootage}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
+                  value={form.squareMeters}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareMeters: text }))}
                   placeholder="2000"
                   keyboardType="numeric"
                 />
@@ -314,11 +321,11 @@ const CreateListingScreen = () => {
             <Text style={styles.fieldGroupTitle}>Plot Details</Text>
             <View style={styles.row}>
               <View style={styles.halfField}>
-                <Text style={styles.label}>Square Footage</Text>
+                <Text style={styles.label}>Square Meters</Text>
                 <TextInput
                   style={styles.input}
-                  value={form.squareFootage}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
+                  value={form.squareMeters}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareMeters: text }))}
                   placeholder="5000"
                   keyboardType="numeric"
                 />
@@ -417,11 +424,11 @@ const CreateListingScreen = () => {
             <Text style={styles.fieldGroupTitle}>Warehouse Details</Text>
             <View style={styles.row}>
               <View style={styles.halfField}>
-                <Text style={styles.label}>Square Footage</Text>
+                <Text style={styles.label}>Square Meters</Text>
                 <TextInput
                   style={styles.input}
-                  value={form.squareFootage}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareFootage: text }))}
+                  value={form.squareMeters}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, squareMeters: text }))}
                   placeholder="10000"
                   keyboardType="numeric"
                 />
@@ -489,10 +496,14 @@ const CreateListingScreen = () => {
 
     try {
       // Here you would typically send the data to your backend
-      // For now, we'll just show a success message
-      Alert.alert("Success!", "Your property listing has been created successfully!", [
-        { text: "OK", onPress: () => console.log("Listing created") },
-      ]);
+      const property = await PropertyService.addProperty(form);
+      if (property.success) {
+        Alert.alert("Success!", "Your property listing has been created successfully!", [
+          { text: "OK", onPress: () => console.log("Listing created") },
+        ]);
+      } else {
+        Alert.alert("Error", "Failed to create listing." + property.error);
+      }
 
       // Reset form
       setForm({
@@ -544,7 +555,7 @@ const CreateListingScreen = () => {
                   onPress={() => setForm((prev) => ({ ...prev, propertyType: type.value }))}
                 >
                   <Ionicons
-                    name={type.icon as any}
+                    name={type.icon}
                     size={24}
                     color={form.propertyType === type.value ? "#fff" : "#4CAF50"}
                   />
@@ -607,14 +618,46 @@ const CreateListingScreen = () => {
             <View style={styles.row}>
               <View style={styles.halfField}>
                 <Text style={styles.label}>Listing Type *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.listing}
-                  onChangeText={(text) =>
-                    setForm((prev) => ({ ...prev, listing: text as ListingType }))
-                  }
-                  placeholder="rent, sale, or lease"
-                />
+                <View style={styles.dropdownContainer}>
+                  <TouchableOpacity
+                    style={styles.dropdownTrigger}
+                    onPress={() => setIsListingDropdownOpen((prev) => !prev)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.dropdownTriggerText}>{selectedListingLabel}</Text>
+                    <Ionicons
+                      name={isListingDropdownOpen ? "chevron-up" : "chevron-down"}
+                      size={20}
+                      color="#4CAF50"
+                    />
+                  </TouchableOpacity>
+                  {isListingDropdownOpen && (
+                    <View style={styles.dropdownOptions}>
+                      {listingTypes.map((type) => (
+                        <TouchableOpacity
+                          key={type.value}
+                          style={[
+                            styles.dropdownOption,
+                            form.listing === type.value && styles.dropdownOptionActive,
+                          ]}
+                          onPress={() => {
+                            setForm((prev) => ({ ...prev, listing: type.value }));
+                            setIsListingDropdownOpen(false);
+                          }}
+                        >
+                          <Text
+                            style={[
+                              styles.dropdownOptionText,
+                              form.listing === type.value && styles.dropdownOptionTextActive,
+                            ]}
+                          >
+                            {type.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           </View>
@@ -869,6 +912,49 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginBottom: 16,
+  },
+  dropdownContainer: {
+    position: "relative",
+    marginBottom: 16,
+  },
+  dropdownTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#f8f9fa",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dropdownTriggerText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
+  },
+  dropdownOptions: {
+    marginTop: 8,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  dropdownOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dropdownOptionActive: {
+    backgroundColor: "#4CAF50",
+  },
+  dropdownOptionText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
+  },
+  dropdownOptionTextActive: {
+    color: "#fff",
   },
   textArea: {
     height: 100,
