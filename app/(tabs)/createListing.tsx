@@ -1,3 +1,4 @@
+import { PropertyService } from "@/services/propertyService";
 import { ListingType, PropertyType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -17,7 +18,6 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { PropertyService } from "@/services/propertyService";
 
 interface PhotoWithCaption {
   uri: string;
@@ -91,6 +91,7 @@ const CreateListingScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isListingDropdownOpen, setIsListingDropdownOpen] = useState(false);
+  const [isRateDropdownOpen, setIsRateDropdownOpen] = useState(false);
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -126,13 +127,15 @@ const CreateListingScreen = () => {
   const selectedListingLabel =
     listingTypes.find((type) => type.value === form.listing)?.label ?? "Select listing type";
 
-  // const rateTypes = [
-  //   { value: "pyr", label: "Per Year" },
-  //   { value: "pm", label: "Per Month" },
-  //   { value: "pw", label: "Per Week" },
-  //   { value: "pd", label: "Per Day" },
-  //   { value: "", label: "One Time" },
-  // ];
+  const rateTypes = [
+    { value: "pyr", label: "Per Year" },
+    { value: "pm", label: "Per Month" },
+    { value: "pd", label: "Per Day" },
+    { value: "", label: "One Time" },
+  ];
+
+  const selectedRateLabel =
+    rateTypes.find((type) => type.value === form.rate)?.label ?? "Select rate";
 
   const handlePhotoUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -606,12 +609,46 @@ const CreateListingScreen = () => {
               </View>
               <View style={styles.halfField}>
                 <Text style={styles.label}>Rate</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.rate}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, rate: text }))}
-                  placeholder="pm (per month)"
-                />
+                <View style={styles.dropdownContainer}>
+                  <TouchableOpacity
+                    style={styles.dropdownTrigger}
+                    onPress={() => setIsRateDropdownOpen((prev) => !prev)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.dropdownTriggerText}>{selectedRateLabel}</Text>
+                    <Ionicons
+                      name={isRateDropdownOpen ? "chevron-up" : "chevron-down"}
+                      size={20}
+                      color="#4CAF50"
+                    />
+                  </TouchableOpacity>
+                  {isRateDropdownOpen && (
+                    <View style={styles.dropdownOptions}>
+                      {rateTypes.map((type) => (
+                        <TouchableOpacity
+                          key={type.value}
+                          style={[
+                            styles.dropdownOption,
+                            form.rate === type.value && styles.dropdownOptionActive,
+                          ]}
+                          onPress={() => {
+                            setForm((prev) => ({ ...prev, rate: type.value }));
+                            setIsRateDropdownOpen(false);
+                          }}
+                        >
+                          <Text
+                            style={[
+                              styles.dropdownOptionText,
+                              form.rate === type.value && styles.dropdownOptionTextActive,
+                            ]}
+                          >
+                            {type.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
 
@@ -736,18 +773,6 @@ const CreateListingScreen = () => {
                 provider={PROVIDER_GOOGLE}
                 showsUserLocation
                 showsCompass
-                // loadingEnabled
-                // showsMyLocationButton
-                // onPress={(e) =>
-                //   setLocation({
-                //     ...e.nativeEvent.coordinate,
-                //     altitude: 0,
-                //     accuracy: 0,
-                //     altitudeAccuracy: 0,
-                //     heading: 0,
-                //     speed: 0,
-                //   })
-                // }
               >
                 {location && (
                   <Marker
