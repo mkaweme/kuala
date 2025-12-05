@@ -3,231 +3,188 @@ import PropertyCard from "@/components/PropertyCard";
 import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
-import { HouseProperty, ListingType, PropertyType, WarehouseProperty } from "@/types";
+import { PropertyService } from "@/services/propertyService";
+import { HouseProperty, ListingType, Property, PropertyType, WarehouseProperty } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
-export const HOUSES: HouseProperty[] = [
-  {
-    id: "e45a2b1c-bfc9-4bfa-90f4-1d87f89c7a47",
-    title: "Modern 1 Bedroom House",
-    noOfBedrooms: 1,
-    area: "Woodlands",
-    town: "Lusaka",
-    listing: ListingType.RENT,
-    price: 200000,
-    rate: "pm",
-    type: PropertyType.HOUSE,
-    features: [
-      "Tiles",
-      "Built-In Kitchen Units",
-      "Built-In Wardrobe",
-      "Road Frontage",
-      "Paved Yard",
-    ],
-    photos: [
-      {
-        name: "Sitting Room",
-        src: ["1", "2"],
-      },
-      {
-        name: "Kitchen",
-        src: ["1", "2"],
-      },
-      {
-        name: "Toilet",
-        src: ["5"],
-      },
-      {
-        name: "Bathroom",
-        src: ["1"],
-      },
-      {
-        name: "Front",
-        src: ["1"],
-      },
-      {
-        name: "Bedroom",
-        src: ["2"],
-      },
-      {
-        name: "Back",
-        src: ["1"],
-      },
-      {
-        name: "Yard",
-        src: ["2"],
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "38a5fce3-1c07-4baf-b77c-774fda1e5d58",
-    noOfBedrooms: 3,
-    area: "Ibex Hill",
-    title: "Spacious 3 Bedroomed House",
-    town: "Lusaka",
-    listing: ListingType.RENT,
-    price: 500000,
-    rate: "pm",
-    type: PropertyType.HOUSE,
-    features: ["Tiles", "Built-In Kitchen Units", "Built-In Wardrobes", "Paved Yard"],
-    photos: [
-      {
-        name: "Sitting Room",
-        src: ["1", "2"],
-      },
-      {
-        name: "Kitchen",
-        src: ["1", "2"],
-      },
-      {
-        name: "Toilet",
-        src: ["1"],
-      },
-      {
-        name: "Bathroom",
-        src: ["6"],
-      },
-      {
-        name: "Front",
-        src: ["7"],
-      },
-      {
-        name: "Bedroom",
-        src: ["8"],
-      },
-      {
-        name: "Back",
-        src: ["9"],
-      },
-      {
-        name: "Yard",
-        src: ["10"],
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "71f2e27a-03a2-4491-9b39-8a882dcf2f59",
-    noOfBedrooms: 3,
-    area: "Meanwood Chamba Valley",
-    title: "Modern 4 bedroomed House",
-    town: "Lusaka",
-    listing: ListingType.SALE,
-    price: 90000000,
-    type: PropertyType.HOUSE,
-    features: [
-      "Tiles",
-      "Built-In Kitchen Units",
-      "Built-In Wardrobe",
-      "Road Frontage",
-      "Open Plan Kitchen",
-      "Paved Yard",
-      "Master Self-contained",
-      "3 Toilets",
-      "2 Baths",
-    ],
-    photos: [
-      {
-        name: "Sitting Room",
-        src: ["2", "1"],
-      },
-      {
-        name: "Kitchen",
-        src: ["3", "4"],
-      },
-      {
-        name: "Toilet",
-        src: ["5"],
-      },
-      {
-        name: "Bathroom",
-        src: ["6"],
-      },
-      {
-        name: "Front",
-        src: ["7"],
-      },
-      {
-        name: "Master Bedroom",
-        src: ["8"],
-      },
-      {
-        name: "Bedroom",
-        src: ["8"],
-      },
-      {
-        name: "Bedroom",
-        src: ["8"],
-      },
-      {
-        name: "Back",
-        src: ["9"],
-      },
-      {
-        name: "Yard",
-        src: ["10"],
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-const WAREHOUSES: WarehouseProperty[] = [
-  {
-    id: "dfc68b83-9d62-41ac-9fd1-6d14b1a908c7",
-    title: "Large Warehouse",
-    area: "Chinika",
-    town: "Lusaka",
-    price: 12000000,
-    rate: "yr",
-    listing: ListingType.LEASE,
-    type: PropertyType.WAREHOUSE,
-    features: ["Road Frontage", "Overhead Crane"],
-    photos: [
-      {
-        name: "Yard",
-        src: ["2", "1"],
-      },
-      {
-        name: "Entrance",
-        src: ["2", "1"],
-      },
-      {
-        name: "Offices",
-        src: ["2", "1"],
-      },
-      {
-        name: "Bathroom",
-        src: ["2", "1"],
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    squareMeters: 2400,
-    ceilingHeight: 12,
-    loadingDock: false,
-  },
-];
-
 const propertyTypes = ["All", "House", "Office", "Plot", "Farm", "Warehouse"];
+
+// Database property interface
+interface DatabaseProperty {
+  id: string;
+  title: string;
+  description?: string;
+  price: number | string;
+  location: string;
+  property_type: PropertyType;
+  use_type: string;
+  is_for_sale: boolean;
+  created_at: string;
+  updated_at: string;
+  area?: string;
+  town?: string;
+  rate?: string;
+  listing?: ListingType;
+  photos?: Array<{ name: string; src: string[] }>;
+  features?: string[];
+  no_of_bedrooms?: number;
+  no_of_bathrooms?: number;
+  square_meters?: number;
+  has_garden?: boolean;
+  has_parking?: boolean;
+  floor_number?: number;
+  has_reception?: boolean;
+  has_meeting_rooms?: number;
+  parking_spaces?: number;
+  zoning?: string;
+  has_utilities?: boolean;
+  road_access?: boolean;
+  terrain?: string;
+  acreage?: number;
+  has_water?: boolean;
+  soil_type?: string;
+  has_buildings?: boolean;
+  agricultural_use?: string[];
+  ceiling_height?: number;
+  loading_dock?: boolean;
+  has_office_space?: boolean;
+  has_security?: boolean;
+}
 
 const Home = () => {
   const { colors } = useColorScheme();
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("All");
   const [selectedHouse, setSelectedHouse] = useState<HouseProperty | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter houses based on property type only
-  const filteredHouses =
+  // Transform database property to UI Property format
+  const transformProperty = (dbProperty: DatabaseProperty): Property | null => {
+    try {
+      const baseProperty = {
+        id: dbProperty.id,
+        title: dbProperty.title,
+        description: dbProperty.description,
+        area: dbProperty.area || "",
+        town: dbProperty.town || "",
+        price:
+          typeof dbProperty.price === "string" ? parseFloat(dbProperty.price) : dbProperty.price,
+        rate: dbProperty.rate || undefined,
+        listing: (dbProperty.listing as ListingType) || ListingType.RENT,
+        photos: dbProperty.photos || [],
+        features: dbProperty.features || [],
+        type: (dbProperty.property_type as PropertyType) || PropertyType.HOUSE,
+        createdAt: dbProperty.created_at || new Date().toISOString(),
+        updatedAt: dbProperty.updated_at || new Date().toISOString(),
+      };
+
+      // Add type-specific fields based on property type
+      switch (dbProperty.property_type) {
+        case PropertyType.HOUSE:
+          return {
+            ...baseProperty,
+            type: PropertyType.HOUSE,
+            noOfBedrooms: dbProperty.no_of_bedrooms || 0,
+            noOfBathrooms: dbProperty.no_of_bathrooms,
+            squareMeters: dbProperty.square_meters,
+            hasGarden: dbProperty.has_garden,
+            hasParking: dbProperty.has_parking,
+          } as HouseProperty;
+
+        case PropertyType.WAREHOUSE:
+          return {
+            ...baseProperty,
+            type: PropertyType.WAREHOUSE,
+            squareMeters: dbProperty.square_meters || 0,
+            ceilingHeight: dbProperty.ceiling_height || 0,
+            loadingDock: dbProperty.loading_dock || false,
+            hasOfficeSpace: dbProperty.has_office_space,
+            hasSecurity: dbProperty.has_security,
+          } as WarehouseProperty;
+
+        case PropertyType.OFFICE:
+          return {
+            ...baseProperty,
+            type: PropertyType.OFFICE,
+            squareMeters: dbProperty.square_meters || 0,
+            floorNumber: dbProperty.floor_number,
+            hasReception: dbProperty.has_reception,
+            hasMeetingRooms: dbProperty.has_meeting_rooms,
+            parkingSpaces: dbProperty.parking_spaces,
+          };
+
+        case PropertyType.PLOT:
+          return {
+            ...baseProperty,
+            type: PropertyType.PLOT,
+            squareMeters: dbProperty.square_meters || 0,
+            zoning: dbProperty.zoning,
+            hasUtilities: dbProperty.has_utilities,
+            roadAccess: dbProperty.road_access,
+            terrain: dbProperty.terrain,
+          };
+
+        case PropertyType.FARM:
+          return {
+            ...baseProperty,
+            type: PropertyType.FARM,
+            acreage: dbProperty.acreage || 0,
+            hasWater: dbProperty.has_water,
+            soilType: dbProperty.soil_type,
+            hasBuildings: dbProperty.has_buildings,
+            agriculturalUse: dbProperty.agricultural_use,
+          };
+
+        default:
+          return null;
+      }
+    } catch (error) {
+      console.error("Error transforming property:", error);
+      return null;
+    }
+  };
+
+  // Fetch properties from database
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setLoading(true);
+        const result = await PropertyService.getAllProperties();
+        if (result.success && result.data) {
+          const transformedProperties = result.data
+            .map(transformProperty)
+            .filter((p): p is Property => p !== null);
+          setProperties(transformedProperties);
+        } else {
+          console.error("Error fetching properties:", result.error);
+        }
+      } catch (error) {
+        console.error("Error in fetchProperties:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  // Filter properties based on property type
+  const filteredProperties =
     selectedPropertyType === "All"
-      ? HOUSES
-      : HOUSES.filter((house) => selectedPropertyType === "House" && house.noOfBedrooms > 0);
+      ? properties
+      : properties.filter((property) => {
+          const typeMap: { [key: string]: PropertyType } = {
+            House: PropertyType.HOUSE,
+            Office: PropertyType.OFFICE,
+            Plot: PropertyType.PLOT,
+            Farm: PropertyType.FARM,
+            Warehouse: PropertyType.WAREHOUSE,
+          };
+          return property.type === typeMap[selectedPropertyType];
+        });
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -298,30 +255,29 @@ const Home = () => {
       {/* Results Count */}
       <View style={styles.resultsContainer}>
         <Text style={[styles.resultsText, { color: colors.textSecondary }]}>
-          {filteredHouses.length} {filteredHouses.length === 1 ? "property" : "properties"} found
+          {loading
+            ? "Loading..."
+            : `${filteredProperties.length} ${filteredProperties.length === 1 ? "property" : "properties"} found`}
         </Text>
       </View>
-      {/* Sample Image elements removed; PropertyCard handles image rendering via IDs */}
       {/* Properties List */}
       <ScrollView
         style={styles.propertiesContainer}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.propertiesContent}
       >
-        {filteredHouses.map((house, index) => (
-          <PropertyCard
-            key={index}
-            property={house}
-            onPress={(property) => setSelectedHouse(property as HouseProperty)}
-          />
-        ))}
-        {WAREHOUSES.map((warehouse, index) => (
-          <PropertyCard
-            key={index}
-            property={warehouse}
-            onPress={(property) => setSelectedHouse(property as HouseProperty)}
-          />
-        ))}
+        {filteredProperties.map(
+          (property) => (
+            console.log("Property:", property),
+            (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onPress={(property) => setSelectedHouse(property as HouseProperty)}
+              />
+            )
+          ),
+        )}
       </ScrollView>
       <PropertyDetailsModal
         visible={selectedHouse !== null}
