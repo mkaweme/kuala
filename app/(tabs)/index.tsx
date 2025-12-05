@@ -266,18 +266,13 @@ const Home = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.propertiesContent}
       >
-        {filteredProperties.map(
-          (property) => (
-            console.log("Property:", property),
-            (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                onPress={(property) => setSelectedHouse(property as HouseProperty)}
-              />
-            )
-          ),
-        )}
+        {filteredProperties.map((property) => (
+          <PropertyCard
+            key={property.id}
+            property={property}
+            onPress={(property) => setSelectedHouse(property as HouseProperty)}
+          />
+        ))}
       </ScrollView>
       <PropertyDetailsModal
         visible={selectedHouse !== null}
