@@ -200,20 +200,42 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
+  // Safely get the first photo source
+  const getFirstPhotoSource = () => {
+    if (
+      property.photos &&
+      Array.isArray(property.photos) &&
+      property.photos.length > 0 &&
+      property.photos[0] &&
+      property.photos[0].src &&
+      Array.isArray(property.photos[0].src) &&
+      property.photos[0].src.length > 0 &&
+      property.photos[0].src[0]
+    ) {
+      return getImageSource(property.photos[0].src[0]);
+    }
+    return require("@/assets/images/1.jpg");
+  };
+
+  const hasValidPhotos =
+    property.photos &&
+    Array.isArray(property.photos) &&
+    property.photos.length > 0 &&
+    property.photos[0] &&
+    property.photos[0].src &&
+    Array.isArray(property.photos[0].src) &&
+    property.photos[0].src.length > 0;
+
   return (
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.8}
       onPress={() => onPress?.(property)}
     >
-      {property.photos.length > 0 && (
+      {hasValidPhotos && (
         <View style={styles.propertyContainer}>
           <View style={styles.imageContainer}>
-            <Image
-              source={getImageSource(property.photos[0].src[0])}
-              style={styles.image}
-              resizeMode="cover"
-            />
+            <Image source={getFirstPhotoSource()} style={styles.image} resizeMode="cover" />
 
             {/* Price Tag */}
             <View style={styles.priceTag}>
@@ -265,13 +287,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </View>
 
               {/* Features */}
-              <View style={styles.featuresContainer}>
-                {property.features.slice(0, 3).map((feature, index) => (
-                  <View key={index} style={styles.featureChip}>
-                    <Text style={styles.featureText}>{feature}</Text>
+              {property.features &&
+                Array.isArray(property.features) &&
+                property.features.length > 0 && (
+                  <View style={styles.featuresContainer}>
+                    {property.features.slice(0, 3).map((feature, index) => (
+                      <View key={index} style={styles.featureChip}>
+                        <Text style={styles.featureText}>{feature}</Text>
+                      </View>
+                    ))}
                   </View>
-                ))}
-              </View>
+                )}
             </View>
           </View>
         </View>
