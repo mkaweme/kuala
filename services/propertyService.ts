@@ -1,6 +1,6 @@
+import { CreateListingForm } from "@/app/(tabs)/createListing";
 import { supabase } from "@/assets/supabase_client";
 import { ListingType, PropertyType } from "@/types";
-import { CreateListingForm } from "@/app/(tabs)/createListing";
 
 export interface CreatePropertyData {
   title: string;
@@ -17,7 +17,7 @@ export interface CreatePropertyData {
   listing?: ListingType;
   features?: string[];
   // Property type specific fields (can be stored as JSON)
-  property_details?: Record<string, any>;
+  property_details?: Record<string, string>;
 }
 
 export interface UpdatePropertyData {
@@ -222,9 +222,7 @@ export class PropertyService {
    * Delete a property
    * Only the creator (owner) can delete the property
    */
-  static async deleteProperty(
-    propertyId: string,
-  ): Promise<{ success: boolean; error?: string }> {
+  static async deleteProperty(propertyId: string): Promise<{ success: boolean; error?: string }> {
     try {
       const {
         data: { user },
@@ -279,7 +277,9 @@ export class PropertyService {
    * Get a property by ID
    * Public method - anyone can view properties
    */
-  static async getProperty(propertyId: string): Promise<{ success: boolean; data?: Property; error?: string }> {
+  static async getProperty(
+    propertyId: string,
+  ): Promise<{ success: boolean; data?: Property; error?: string }> {
     try {
       const { data, error } = await supabase
         .from("properties")
@@ -339,5 +339,30 @@ export class PropertyService {
       };
     }
   }
-}
 
+  /**
+   * Get all properties
+   * Public method - anyone can view all properties
+   */
+  static async getAllProperties(): Promise<{ success: boolean; data?: any[]; error?: string }> {
+    try {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching properties:", error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, data: data || [] };
+    } catch (error) {
+      console.error("Error in getAllProperties:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to fetch properties",
+      };
+    }
+  }
+}
