@@ -1,7 +1,4 @@
-export interface Photo {
-  name: string;
-  src: string[];
-}
+import { Photo } from "./property";
 
 export interface House {
   area: string;

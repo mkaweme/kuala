@@ -3,9 +3,6 @@ export interface Photo {
   src: string[];
 }
 
-// export type PropertyType = "house" | "office" | "plot" | "farm" | "warehouse";
-// export type ListingType = "rent" | "sale" | "lease";
-
 export enum PropertyType {
   HOUSE = "house",
   OFFICE = "office",
