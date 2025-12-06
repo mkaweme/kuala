@@ -32,5 +32,6 @@
     "fs",
     "http",
     "net"
-  ]
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
 }
