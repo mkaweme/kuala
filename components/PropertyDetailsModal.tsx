@@ -2,14 +2,14 @@ import { Property } from "@/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useMemo, useState } from "react";
 import {
-  Dimensions,
-  Image,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    Image,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import BookingModal from "./BookingModal";
 
@@ -68,7 +68,7 @@ const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
 
   const imageSources = useMemo(() => {
     if (!property) return [] as string[];
-    const flat = property.photos.flatMap((p) => p.src);
+    const flat = property.photos.flatMap((p) => p.uri);
     return flat.filter((s) => typeof s === "string");
   }, [property]);
 

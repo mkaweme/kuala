@@ -138,7 +138,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         if (isOfficeProperty(property)) {
           return (
             <Text style={styles.bedroomsText}>
-              {property.squareMeters} sq ft Office
+              {property.squareMeters} sq meters Office
               {property.floorNumber && ` • Floor ${property.floorNumber}`}
             </Text>
           );
@@ -149,7 +149,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         if (isPlotProperty(property)) {
           return (
             <Text style={styles.bedroomsText}>
-              {property.squareMeters} sq ft Plot
+              {property.squareMeters} sq meters Plot
               {property.zoning && ` • ${property.zoning} Zoning`}
             </Text>
           );
@@ -202,29 +202,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   // Safely get the first photo source
   const getFirstPhotoSource = () => {
-    if (
-      property.photos &&
-      Array.isArray(property.photos) &&
-      property.photos.length > 0 &&
-      property.photos[0] &&
-      property.photos[0].src &&
-      Array.isArray(property.photos[0].src) &&
-      property.photos[0].src.length > 0 &&
-      property.photos[0].src[0]
-    ) {
-      return getImageSource(property.photos[0].src[0]);
+    const isThereAPhoto2 = property.photos && Array.isArray(property.photos);
+    if (isThereAPhoto2) {
+      return getImageSource(property.photos[0].uri);
     }
-    return require("@/assets/images/1.jpg");
+    console.log(property.photos[0].uri[0]);
+    return require("@/assets/images/2.jpg");
   };
 
-  const hasValidPhotos =
-    property.photos &&
-    Array.isArray(property.photos) &&
-    property.photos.length > 0 &&
-    property.photos[0] &&
-    property.photos[0].src &&
-    Array.isArray(property.photos[0].src) &&
-    property.photos[0].src.length > 0;
+  const hasValidPhotos = property.photos?.length > 0;
 
   return (
     <TouchableOpacity

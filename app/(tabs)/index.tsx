@@ -4,7 +4,14 @@ import PropertyDetailsModal from "@/components/PropertyDetailsModal";
 import { Text, View } from "@/components/Themed";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { PropertyService } from "@/services/propertyService";
-import { HouseProperty, ListingType, Property, PropertyType, WarehouseProperty } from "@/types";
+import {
+  HouseProperty,
+  ListingType,
+  Photo,
+  Property,
+  PropertyType,
+  WarehouseProperty,
+} from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
@@ -27,7 +34,7 @@ interface DatabaseProperty {
   town?: string;
   rate?: string;
   listing?: ListingType;
-  photos?: Array<{ name: string; src: string[] }>;
+  photos?: Array<Photo>;
   features?: string[];
   no_of_bedrooms?: number;
   no_of_bathrooms?: number;
@@ -56,7 +63,7 @@ interface DatabaseProperty {
 const Home = () => {
   const { colors } = useColorScheme();
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("All");
-  const [selectedHouse, setSelectedHouse] = useState<HouseProperty | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -270,14 +277,14 @@ const Home = () => {
           <PropertyCard
             key={property.id}
             property={property}
-            onPress={(property) => setSelectedHouse(property as HouseProperty)}
+            onPress={(property) => setSelectedProperty(property)}
           />
         ))}
       </ScrollView>
       <PropertyDetailsModal
-        visible={selectedHouse !== null}
-        property={selectedHouse}
-        onClose={() => setSelectedHouse(null)}
+        visible={selectedProperty !== null}
+        property={selectedProperty}
+        onClose={() => setSelectedProperty(null)}
       />
       <DropdownMenu visible={dropdownVisible} onClose={() => setDropdownVisible(false)} />
     </ScrollView>

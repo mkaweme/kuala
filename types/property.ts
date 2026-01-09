@@ -1,6 +1,6 @@
 export interface Photo {
-  name: string;
-  src: string[];
+  caption: string;
+  uri: string;
 }
 
 export enum PropertyType {
