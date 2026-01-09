@@ -1,0 +1,22 @@
+# Ignore native builds
+android/
+ios/
+
+# Ignore node modules installed locally
+node_modules/
+
+# Ignore Expo caches
+.expo/
+.expo-shared/
+
+# Ignore build output
+dist/
+build/
+.npm/
+.gradle/
+.gradle-cache/
+
+# Ignore local dev files
+*.log
+*.tmp
+.DS_Store
