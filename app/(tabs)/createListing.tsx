@@ -1,6 +1,8 @@
+import { supabase } from "@/assets/supabase_client";
 import { PropertyService } from "@/services/propertyService";
-import { ListingType, PropertyType } from "@/types";
+import { ListingType, Photo, PropertyType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import React, { ComponentProps, useEffect, useState } from "react";
@@ -80,18 +82,18 @@ const CreateListingScreen = () => {
     listing: ListingType.RENT,
     area: "",
     town: "",
-    features: [],
-    photos: [],
+    features: [] as string[],
+    photos: [] as Photo[],
     location: {
       latitude: -15.3875, // Lusaka coordinates
       longitude: 28.3228,
     },
   });
-  const [currentFeature, setCurrentFeature] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isListingDropdownOpen, setIsListingDropdownOpen] = useState(false);
-  const [isRateDropdownOpen, setIsRateDropdownOpen] = useState(false);
+  const [currentFeature, setCurrentFeature] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isListingDropdownOpen, setIsListingDropdownOpen] = useState<boolean>(false);
+  const [isRateDropdownOpen, setIsRateDropdownOpen] = useState<boolean>(false);
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -484,6 +486,65 @@ const CreateListingScreen = () => {
     }
   };
 
+  const generateSafeFileName = async (ext: string) => {
+    const uuid = Crypto.randomUUID();
+    return `${uuid}.${ext}`;
+  };
+
+  // Safe upload function with full error handling
+  async function uploadPhotos(form: CreateListingForm) {
+    try {
+      const uploadResults = await Promise.all(
+        form.photos.map(async (photo: Photo, index: number) => {
+          try {
+            // Validate URI
+            if (!photo.uri) {
+              console.warn(`Photo #${index} has no URI`);
+              return { success: false, error: "Missing URI" };
+            }
+
+            // Fetch blob
+            let response;
+            try {
+              response = await fetch(photo.uri);
+            } catch (err) {
+              console.error("Fetch failed:", err);
+              return { success: false, error: "Failed to fetch local file" };
+            }
+
+            const blob = await response.blob();
+            const ext = photo.uri.split(".").pop() || "jpg";
+
+            // Generate sanitized filename
+            const fileName = await generateSafeFileName(ext);
+
+            // Upload to Supabase
+            const { data, error } = await supabase.storage
+              .from("photos")
+              .upload(`uploads/${fileName}`, blob, {
+                contentType: blob.type,
+              });
+
+            if (error) {
+              console.error("Upload error:", error);
+              return { success: false, error };
+            }
+
+            return { success: true, fileName, data };
+          } catch (err) {
+            console.error("Unexpected error uploading photo:", err);
+            return { success: false, error: err };
+          }
+        }),
+      );
+
+      return uploadResults;
+    } catch (err) {
+      console.error("Fatal upload error:", err);
+      throw err; // rethrow so caller knows upload failed
+    }
+  }
+
   const handleSubmit = async () => {
     if (!form.title || !form.price || !form.area || !form.town) {
       Alert.alert("Missing Information", "Please fill in all required fields");
@@ -496,6 +557,8 @@ const CreateListingScreen = () => {
     }
 
     setIsSubmitting(true);
+
+    uploadPhotos(form);
 
     try {
       // Here you would typically send the data to your backend
