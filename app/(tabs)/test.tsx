@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Button, Image, ImageSourcePropType, StyleSheet, Text, View } from "react-native";
@@ -50,30 +51,47 @@ const test = () => {
   //   return await response.blob();
   // }
 
-  async function uriToBlob(uri: string): Promise<Blob> {
+  // async function uriToBlob(uri: string): Promise<Blob> {
+  //   const base64 = await FileSystem.readAsStringAsync(uri, {
+  //     encoding: FileSystem.EncodingType.Base64,
+  //   });
+
+  //   const byteCharacters = atob(base64);
+  //   const byteNumbers = new Array(byteCharacters.length);
+
+  //   for (let i = 0; i < byteCharacters.length; i++) {
+  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //   }
+
+  //   const byteArray = new Uint8Array(byteNumbers);
+
+  //   return new Blob([byteArray], { type: "image/jpeg" });
+  // }
+
+  async function uriToArrayBuffer(uri: string): Promise<ArrayBuffer> {
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
 
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
     }
 
-    const byteArray = new Uint8Array(byteNumbers);
-
-    return new Blob([byteArray], { type: "image/jpeg" });
+    return bytes.buffer;
   }
 
   async function uploadPhoto(uri: string, userId: string): Promise<string> {
-    const blob = await uriToBlob(uri);
+    const arrayBuffer = await uriToArrayBuffer(uri);
+
+    console.log(arrayBuffer instanceof ArrayBuffer); // true
 
     const fileExt = uri.split(".").pop() ?? "jpg";
     const fileName = `${userId}/${Date.now()}.${fileExt}`;
 
-    const { error } = await supabase.storage.from("photos").upload(fileName, blob, {
+    const { error } = await supabase.storage.from("photos").upload(fileName, arrayBuffer, {
       contentType: "image/jpeg",
       upsert: false,
     });
@@ -105,12 +123,30 @@ const test = () => {
     }
   };
 
+  const handleFetchImage = async () => {
+    if (!image) {
+      console.error("No image selected for upload.");
+      return;
+    }
+    console.log("Image: ", image);
+
+    // Replace 'user.id' with correct user value if necessary
+    const userId = user?.id ?? "default_user"; // Change as needed
+
+    try {
+      const { data, error } = await supabase.storage.from("photos").download("folder/avatar1.png");
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  };
+
   return (
     <View>
       <Text>Image Upload</Text>
       <Button title="Pick Image" onPress={pickImage} />
       {image !== null && <Image source={{ uri: image.uri }} style={styles.image} />}
       <Button title="Upload" onPress={handleUpload} />
+      <Button title="Fetch Image" onPress={handleFetchImage} />
     </View>
   );
 };
